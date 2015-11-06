@@ -6,13 +6,12 @@
 
 (* Defining possible movement direction *)
 type dir = Up | Down | Left | Right
-and opt = Help of str | Game_State of gamestate
 (* Defining possible commands *)
 and cmd =
   | Quit
   | NewGame
-  | Print of opt
-  | Move of dir*int
+  | Help of str
+  | Move of (dir*int)
 
 (* Prompts user for next move *)
 val prompt      : gamestate -> (dir * int)
