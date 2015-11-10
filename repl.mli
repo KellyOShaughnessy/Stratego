@@ -1,3 +1,5 @@
+open Gamestate
+
 (* repl.mli:
     Facilitates interaction between the game and the user.
       - Parsing
@@ -10,7 +12,7 @@ type dir = Up | Down | Left | Right
 and cmd =
   | Quit
   | NewGame
-  | Help of str
+  | Help of bytes
   | Move of (dir*int)
 
 (* Prompts user for next move *)
