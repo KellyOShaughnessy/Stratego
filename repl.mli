@@ -1,4 +1,4 @@
-(* repl.mli:
+(* Stratego repl.mli:
     Facilitates interaction between the game and the user.
       - Parsing
       - Printing
