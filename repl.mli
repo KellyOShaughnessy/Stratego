@@ -8,6 +8,7 @@ open Gamestate
 
 (* Defining possible movement direction *)
 type dir = Up | Down | Left | Right
+
 (* Defining possible commands *)
 and cmd =
   | Quit
@@ -15,21 +16,23 @@ and cmd =
   | Help of bytes
   | Move of (dir*int)
 
-(* Prompts user for next move *)
+(* [prompt gamestate] prompts user for next move
+* - returns a tuple of the next direction and the amount of spaces to move *)
 val prompt      : gamestate -> (dir * int)
 
-(* print game *)
+(* [print_game gamestate] prints the gameboard *)
 val print_game  : gamestate -> unit
 
-(* print help menu *)
+(* [print_help gamestate] prints the full help menu with all options *)
 val print_help  : gamestate -> unit
 
-(* processes the comand and initiates the chnge. Returns the new gamestate *)
+(* [process gamestate] processes the comand [cmd] and initiates the change.
+* Returns the updated gamestate *)
 val process     : gamestate -> cmd -> gamestate
 
-(* returns a new game state *)
+(* [new_game gamestate] returns a new, fresh gamestate *)
 val new_game    : gamestate -> gamestate
 
-(* returns the final gamestate and quits the game *)
+(* [quit gamestate] returns the final gamestate and quits the game *)
 val quit        : gamestate -> unit
 
