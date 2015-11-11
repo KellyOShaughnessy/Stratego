@@ -21,7 +21,7 @@ and player = {pieces: (piece*location) list; graveyard: piece list}
 (* Using ocaml-matrix, make_matrix
 * piece is the piece in that location with the string of the player,
 * None if location is empty *)
-and game_board = ((piece*string) option) array array
+and game_board = (location*((piece*player) option)) list
 
 and gamestate = {gb: game_board ; human: player; comp: player; turn: string}
 

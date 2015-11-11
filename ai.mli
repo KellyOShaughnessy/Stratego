@@ -1,4 +1,5 @@
 open Gamestate
+open Repl
 
 (* [setup game_board] takes the the pieces for the computer player
 during initialization *)
