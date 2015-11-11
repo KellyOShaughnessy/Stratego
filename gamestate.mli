@@ -17,8 +17,13 @@ and player = {pieces : (piece*location) list; graveyard : piece list}
 
 (* Using ocaml-matrix, make_matrix
 * piece is the piece in that location with the string of the player,
-* None if location is empty *)
-type game_board = ((piece*string) option) array array
+* None if location is empty
+type game_board = ((piece*player) option) array array *)
+
+(* Store each location on the game board and a (piece*player) option
+  so that the value is None if the location is empty and
+  Some(piece, player) if the position currently holds a piece *)
+type game_board = (location, (piece*player) option) list
 
 type gamestate = {gb : game_board ; human : player;
                   comp : player; turn: string}
