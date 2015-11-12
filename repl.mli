@@ -14,7 +14,7 @@ and cmd =
   | Quit
   | NewGame
   | Help of bytes
-  | Move of (dir*int)
+  | Move of (piece*dir*int)
 
 (* [prompt gamestate] prompts user for next move
 * - returns a tuple of the next direction and the amount of spaces to move *)

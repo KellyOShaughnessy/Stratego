@@ -8,7 +8,7 @@ and cmd =
   | Quit
   | NewGame
   | Help of bytes
-  | Move of (dir*int)
+  | Move of (piece*dir*int)
 
 let prompt gamestate = failwith "unimplemented"
 
