@@ -18,7 +18,7 @@ and cmd =
 
 (* [prompt gamestate] prompts user for next move
 * - returns a tuple of the next direction and the amount of spaces to move *)
-val prompt      : gamestate -> (dir * int)
+val prompt      : gamestate -> cmd
 
 (* [print_game gamestate] prints the gameboard *)
 val print_game  : gamestate -> unit
