@@ -31,9 +31,6 @@ type gamestate = {gb : game_board ; human : player;
 (* Initializes game state from user input and computer generated setup *)
 val new_game : location option -> piece option -> gamestate -> gamestate
 
-(* Computer chooses its next move *)
-val computer_move : game_board -> player -> (piece*location)
-
 (* Uses player assocation pieces record to get the location of a piece *)
 val get_location : player -> piece -> location
 
