@@ -18,8 +18,7 @@ type piece =
 and player = {pieces: (piece*location) list; graveyard: piece list}
 
 
-(* Using ocaml-matrix, make_matrix
-* piece is the piece in that location with the string of the player,
+(* piece is the piece in that location with the string of the player,
 * None if location is empty *)
 and game_board = (location*((piece*player) option)) list
 
