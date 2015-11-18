@@ -17,6 +17,7 @@ type piece =
 
 and player = {pieces: (piece*location) list; graveyard: piece list}
 
+(*function that gets rank of the piece so that in attack, it can match on the rankings.*)
 
 (* piece is the piece in that location with the string of the player,
 * None if location is empty *)
