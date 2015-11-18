@@ -28,9 +28,6 @@ and gamestate = {gb: game_board ; human: player; comp: player; turn: string}
 (* Initializes game state from user input and computer generated setup *)
 let new_game location piece gamestate  = failwith "unimplemented"
 
-(* Computer chooses its next move *)
-let computer_move  game_board player  = failwith "unimplemented"
-
 (* Uses player assocation pieces record to get the location of a piece *)
 let get_location  player  piece  = failwith "unimplemented"
 
