@@ -1,4 +1,4 @@
-type location = (int * int)
+type location = (char * int)
 and piece =
   | Flag
   | Bomb
@@ -13,7 +13,7 @@ and piece =
   | Lieutenant of int
   | Sergeant of int
   | Corporal of int
-and player = {name: bytes; pieces : (piece*location) list; graveyard : piece list}
+and player = {pieces : (piece*location) list; graveyard : piece list}
 
 (* Using ocaml-matrix, make_matrix
 * piece is the piece in that location with the string of the player,
@@ -30,6 +30,9 @@ type gamestate = {gb : game_board ; human : player;
 
 (* Initializes game state from user input and computer generated setup *)
 val new_game : location option -> piece option -> gamestate -> gamestate
+
+(* Computer chooses its next move *)
+val computer_move : game_board -> player -> (piece*location)
 
 (* Uses player assocation pieces record to get the location of a piece *)
 val get_location : player -> piece -> location
@@ -62,13 +65,4 @@ val attack : piece -> piece -> (piece option)
 * If validate_move returns false,
 *   asks player to try a different move *)
 val move : gamestate -> player -> piece -> location -> gamestate
-
-(* [print_game_board game_board] Prints the current game_board *)
-val print_game_board : game_board -> unit
-
-(* [piece_to_string piece] Converts the [piece] to the string representation *)
-val piece_to_string : piece -> bytes
-
-(* [print_gamestate gamestate]  *)
-val print_gamestate : gamestate -> unit
 
