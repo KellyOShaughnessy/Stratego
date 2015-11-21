@@ -21,8 +21,8 @@ let human_list =
   ((Lieutenant 6),(8,2));
   ((Sergeant 5),(9,2));
   ((Scout 2),(10,2))]
-in
-let comp_list =
+
+let computer_list =
   [((Spy 1),(1,9));
   ((Scout 2),(2,9));
   ((Captain 3),(3,9));
@@ -43,36 +43,34 @@ let comp_list =
   ((Lieutenant 6),(8,10));
   ((Sergeant 5),(9,10));
   ((Scout 2),(10,10))]
-in
 
-let hum = {name= "human"; pieces = human_list; graveyard=[]} in
-let comp = {name= "comp"; pieces = comp_list; graveyard=[]} in
+
+let hum = {name= "human"; pieces = human_list; graveyard=[]}
+let computer = {name= "comp"; pieces = computer_list; graveyard=[]}
 
 let game_board =
 [
+((1,10),Some (Miner 2, computer));
+((2,10),Some (Marshal 9, computer));
+((3,10),Some (Lieutenant 6, computer));
+((4,10),Some (Bomb, computer));
+((5,10),Some (Bomb, computer));
+((6,10),Some (Bomb, computer));
+((7,10),Some (Scout 2, computer));
+((8,10),Some (Lieutenant 6, computer));
+((9,10),Some (Sergeant 5, computer));
+((10,10),Some (Scout 2, computer));
 
-((1,10),Some (Miner 2, comp));
-((2,10),Some (Marshal 9, comp));
-((3,10),Some (Lieutenant 6, comp));
-((4,10),Some (Bomb, comp));
-((5,10),Some (Bomb, comp));
-((6,10),Some (Bomb, comp));
-((7,10),Some (Scout 2, comp));
-((8,10),Some (Lieutenant 6, comp));
-((9,10),Some (Sergeant 5, comp));
-((10,10),Some (Scout 2, comp));
-
-((1,9),Some (Spy 1,comp));
-((2,9),Some (Scout 2,comp));
-((3,9),Some (Captain 3,comp));
-((4,9),Some (Major 4,comp));
-((5,9),Some (Flag,comp));
-((6,9),Some (Sergeant 5,comp));
-((7,9),Some (Colonel 6,comp));
-((8,9),Some (Miner 2,comp));
-((9,9),Some (General 7,comp));
-((10,9),Some (Captain 8,comp));
-
+((1,9),Some (Spy 1,computer));
+((2,9),Some (Scout 2,computer));
+((3,9),Some (Captain 3,computer));
+((4,9),Some (Major 4,computer));
+((5,9),Some (Flag,computer));
+((6,9),Some (Sergeant 5,computer));
+((7,9),Some (Colonel 6,computer));
+((8,9),Some (Miner 2,computer));
+((9,9),Some (General 7,computer));
+((10,9),Some (Captain 8,computer));
 
 ((1,8),None);
 ((2,8),None);
@@ -163,6 +161,22 @@ let game_board =
 ((10,1),Some (Captain 8,hum));
 ]
 
-in
-let game_state = {gb=game_board; human=hum;comp=comp;turn="human"} in
-print_gamestate game_state
+let gamestate = {gb=game_board; human=hum; comp=computer; turn="human"}
+
+(* Tests that we got rid of the right piece from human pieces list *)
+let (new_gb,hum1) = (remove_from_board game_board hum (Miner 2) (8,1))
+TEST = (List.assoc (Miner 2) hum1.pieces) = (1,2)
+let (new_gb1, hum2) = (remove_from_board new_gb hum1 (Miner 2) (1,2))
+TEST = (try List.assoc (Miner 2) hum2.pieces with Not_found -> (-1,-1)) = (-1,-1)
+
+(* Test add_to_board *)
+let gamestate = {gamestate with gb = new_gb}
+let (new_gb2, hum3) = (add_to_board game_board hum (Miner 2) (8,1))
+TEST = (List.assoc (Miner 2) hum3.pieces) = (8,1)
+TEST = (List.mem (Miner 2) hum3.graveyard) = false
+
+(* tests that the game board references the piece and the new player *)
+TEST = (List.assoc (8,1) new_gb2) = Some (Miner 2, hum3)
+TEST = (List.assoc (2,2) new_gb2) = Some (Marshal 9, hum3)
+
+let () = Pa_ounit_lib.Runtime.summarize()

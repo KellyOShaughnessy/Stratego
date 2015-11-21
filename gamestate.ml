@@ -45,7 +45,119 @@ piece1 is my piece
 piece2 is the piece that was on the tile. *)
 let attack piece1 piece2 = failwith "unimplemented"
 
-let move gamestate player piece location = failwith "unimplemented"
+
+let remove_from_board game_board player piece location =
+  let new_player_pieces =
+    (List.filter
+      (fun (pce,(col,row)) ->
+        pce<>piece || (col,row)<>location
+      )
+      player.pieces
+    )
+  in
+  let new_player_1 = {player with pieces=new_player_pieces} in
+  let new_player_2 = {new_player_1 with graveyard=piece::player.graveyard} in
+  let new_game_board =
+    (List.map
+      (fun ((col,row),some_piece) ->
+        if (col,row)=location then
+          ((col,row),None)
+        else
+          (match some_piece with
+            | None -> ((col,row),some_piece)
+            | Some (pce,_) -> ((col,row),Some (pce,new_player_2))
+          )
+      )
+      game_board)
+  in
+  (new_game_board,new_player_2)
+
+let rec remove_first_from_list piece lst =
+  match lst with
+  | [] -> []
+  | h::t -> if h=piece then t else h::remove_first_from_list piece t
+
+let add_to_board game_board player piece location =
+  let new_graveyard = remove_first_from_list piece player.graveyard in
+  let new_player_pieces =
+    (List.map
+      (fun (pce,(col,row)) ->
+        if pce=piece then
+          (pce,location)
+        else
+          (pce,(col,row))
+      )
+    player.pieces
+  )
+  in
+  let new_player_1 = {player with pieces=new_player_pieces} in
+  let new_player_2 = {new_player_1 with graveyard=new_graveyard} in
+  let new_gameboard =
+    (List.map
+      (fun ((col,row),some_piece) ->
+        if (col,row)=location then
+          ((col,row),Some (piece,new_player_2))
+        else
+          (match some_piece with
+          | None -> ((col,row),some_piece)
+          | Some (pce,_) -> ((col,row),Some (pce, new_player_2))))
+      game_board)
+  in
+  (new_gameboard, new_player_2)
+
+(* returns a new gamestate with updated piece locations
+* - [gamestate] is the current gamestate to be updated
+* - [player] is the current player
+* - [piece] is the piece to try to move
+* - [location] is the desired end location
+* Calls get_location to get the current location of the pice
+* Calls validate_move to verify that that piece can move to the end location
+* If validate_move returns true with no piece,
+*   update game state with the current piece
+* If validate_move returns true with some piece,
+*   calls attack function and updates board
+* If validate_move returns false,
+*   asks player to try a different move *)
+let move gamestate player piece end_location =
+  let start_location = get_location player piece in
+  let game_board = gamestate.gb in
+  match validate_move game_board player piece end_location with
+  | (true, Some opp_piece) ->
+      (match attack piece opp_piece with
+      | None ->
+          let (removed_start_gb, new_player) = remove_from_board game_board
+                                                player piece start_location in
+          let (removed_end_gb, new_opp_player) = remove_from_board
+                                                removed_start_gb new_player
+                                                opp_piece end_location in
+          let changed_gs = {gamestate with gb = removed_end_gb} in
+          let new_gs =
+            (if player.name = "human" then
+              {changed_gs with human = new_player; comp = new_opp_player}
+            else
+              {changed_gs with human = new_opp_player; comp = new_player})
+          in
+          (true, new_gs)
+      | Some pce -> failwith "TODO"
+(*           let (removed_start_gb, new_player) = remove_from_board game_board
+                                                player piece start_location in
+          let (add_end_gb, newer_player) = add_to_board removed_start_gb
+                                            newer_player *)
+      )
+
+  | (true, None) ->
+      let (removed_gb,new_player) = remove_from_board game_board player
+                                      piece start_location
+      in
+      let (added_gb,newer_player) = add_to_board removed_gb new_player
+                                      piece end_location
+      in
+      if player.name="human" then
+        (true,{gamestate with gb = added_gb; human = newer_player})
+      else
+        (true,{gamestate with gb = added_gb; comp = newer_player})
+  | (false, _) -> (false, gamestate)
+
 
 let piece_to_string (piece:piece) =
   match piece with

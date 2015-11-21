@@ -48,11 +48,15 @@ val validate_move : game_board -> player -> piece -> location ->
 * remain on the game board *)
 val attack : piece -> piece -> (piece option)
 
+val remove_from_board : game_board -> player -> piece -> location -> game_board*player
+
+val add_to_board : game_board -> player -> piece -> location -> game_board*player
+
 (* returns a new gamestate with updated piece locations
 * - [gamestate] is the current gamestate to be updated
 * - [player] is the current player
 * - [piece] is the piece to try to move
-* - [location] is the desired end location
+* - [end_location] is the desired end location
 * Calls get_location to get the current location of the pice
 * Calls validate_move to verify that that piece can move to the end location
 * If validate_move returns true with no piece,
@@ -61,7 +65,7 @@ val attack : piece -> piece -> (piece option)
 *   calls attack function and updates board
 * If validate_move returns false,
 *   asks player to try a different move *)
-val move : gamestate -> player -> piece -> location -> gamestate
+val move : gamestate -> player -> piece -> location -> (bool*gamestate)
 
 (* [print_game_board game_board] Prints the current game_board *)
 val print_game_board : game_board -> unit
