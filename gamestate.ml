@@ -39,19 +39,9 @@ let empty_game () : game_board =
     done
   done; (!newer)
 
-(* let player_add p l *)
-
-
-(* Initializes game state from user input and computer generated setup *)
-(* Testing:
-let human = {name="human"; pieces = [(Spy 3, (7,3)); (Flag, (10,4))]; graveyard=[]}
-in let comp = {name="comp"; pieces = [(Spy 3, (1,6)); (Flag, (1,10))]; graveyard=[]}
-in print_gamestate (new_game human comp);;
- *)
-let new_game (human:player) (comp:player): gamestate =
-  if List.length human.pieces = List.length comp.pieces then (
-    let board = empty_game () in
-    let rec newboard b pi pl = (
+let making_game h c =
+  let board = empty_game () in
+  let rec newboard b pi pl = (
       match pi with
       | [] -> b
       | (p,l)::t -> ( let n = List.map (fun (loc, op) -> (if (loc=l)
@@ -61,9 +51,28 @@ let new_game (human:player) (comp:player): gamestate =
         newboard n t pl
       )
     ) in
-    let new1 = newboard board comp.pieces comp in
-    let new2 = newboard new1 human.pieces human in
-    {gb = new2; human = human; comp = comp; turn = human}
+  let new1 = newboard board c.pieces c in
+  let new2 = newboard new1 h.pieces h in
+  new2
+
+let add_human (board: game_board) (h: player) (loc: location) (p: piece): player =
+  let pieces = h.pieces in
+  let newp = pieces@[(p,loc)] in
+  {name= h.name; pieces = newp; graveyard = h.graveyard}
+
+(* let add board h loc p c =
+   *)
+
+
+(* Initializes game state from user input and computer generated setup *)
+(* Testing:
+let human = {name="human"; pieces = [(Spy 3, (7,3)); (Flag, (10,4))]; graveyard=[]}
+in let comp = {name="comp"; pieces = [(Spy 3, (1,6)); (Flag, (1,10))]; graveyard=[]}
+in print_gamestate (new_game human comp);;
+ *)
+let new_game (human:player) (comp:player) (board: game_board): gamestate =
+  if List.length human.pieces = List.length comp.pieces then (
+    {gb = board; human = human; comp = comp; turn = human}
   ) else failwith "It seems that you have not placed all of your pieces"
 
 (* Uses player assocation pieces record to get the location of a piece
