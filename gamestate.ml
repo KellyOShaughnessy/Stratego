@@ -39,6 +39,9 @@ let empty_game () : game_board =
     done
   done; (!newer)
 
+(* let player_add p l *)
+
+
 (* Initializes game state from user input and computer generated setup *)
 (* Testing:
 let human = {name="human"; pieces = [(Spy 3, (7,3)); (Flag, (10,4))]; graveyard=[]}
@@ -46,20 +49,22 @@ in let comp = {name="comp"; pieces = [(Spy 3, (1,6)); (Flag, (1,10))]; graveyard
 in print_gamestate (new_game human comp);;
  *)
 let new_game (human:player) (comp:player): gamestate =
-  let board = empty_game () in
-  let rec newboard b pi pl = (
-    match pi with
-    | [] -> b
-    | (p,l)::t -> ( let n = List.map (fun (loc, op) -> (if (loc=l)
-      then (if op = None then (loc, Some(p,pl))
-      else failwith "You are trying to place two pieces in the same location...")
-      else (loc,op))) b in
-      newboard n t pl
-    )
-  ) in
-  let new1 = newboard board comp.pieces comp in
-  let new2 = newboard new1 human.pieces human in
-  {gb = new2; human = human; comp = comp; turn = human}
+  if List.length human.pieces = List.length comp.pieces then (
+    let board = empty_game () in
+    let rec newboard b pi pl = (
+      match pi with
+      | [] -> b
+      | (p,l)::t -> ( let n = List.map (fun (loc, op) -> (if (loc=l)
+        then (if op = None then (loc, Some(p,pl))
+        else failwith "You are trying to place two pieces in the same location...")
+        else (loc,op))) b in
+        newboard n t pl
+      )
+    ) in
+    let new1 = newboard board comp.pieces comp in
+    let new2 = newboard new1 human.pieces human in
+    {gb = new2; human = human; comp = comp; turn = human}
+  ) else failwith "It seems that you have not placed all of your pieces"
 
 (* Uses player assocation pieces record to get the location of a piece
 get location. try with, and check if that piece is in the player's piece to chekc
@@ -161,34 +166,49 @@ let print_gamestate (gamestate:gamestate) =
   Printf.printf "     Turn: %s\n\n" t;
 
 
-(* Sarah TODO:
-Qs and concerns:
+(* Sarah:
+Completed:
+ - new game // hard to tell what we'll want the input to be
  - changed the print function a bit for game board
- - changed it a lot for game state
- - Added an empty gameboard function --> good for testing printing
+ - changed the print function a decent amount for game state
+ - Added an empty gameboard function
+ - Some testing -- see comments above functions
+
+Qs and concerns:
 
  - do we want the board to reappear after every time the player places a piece?
- - How do we make sure that the player and the computer have the same number of
- pieces?
+    --> right now new_game takes in the completed human and comp player
+        - Right now new_game takes in the two players and forms the original game state
+          --> Is this what we want OR we could have the input be just a list of
+          (piece, location) as defined by the user in the I/O and comp list could be
+          created by calling the AI directly.
+          --> only input would then be the list... to be revisited
+    --> wouldn't be able to execute if comp and player don't have the same number
+    of pieces --- safety measure that ensures the player is done initializion
+    --> also right now the new_game function only screams when you try to put a
+    piece were another is already once you have already declared where you want
+    everything to be. That error definitely needs to be moved up the chain to when
+    you originally try to put something in an occupied spot
 
- - If the gameboard now holds the piece*player then the player does not need to
- his pieces...
+ - If the gameboard now holds the piece*player then the player holds
+ his pieces... that's REALLY redundant... and could lead to errors if we're not
+ careful
     - At the same time this is helpful in initialization
+    - maybe move should also try to update only the player and then automatically
+    update the game state
+        --> but you would need to run through the human.pieces to see which one
+        changed --> long and stupid
+
  - how will the pieces of same type and player appear different in the game?
+
  - how will the player identify the piece that he would like to move?
+
  - Should we switch the whole name thing in players to be a variant
  type player_type = Human | Comp
 
- - How can we stop people from putting things in the same place?
  - How can we tell them only to put stuff within specific rows and colums?
     -- Rows: probs only bottom 4...?
     -- colums: 1-10
 
  - Do we see the opponent's graveyard??
-
- - Right now new_game takes in the two players and forms the original game state
-      --> Is this what we want OR we could have the input be just a list of
-      (piece, location) as defined by the user in the I/O and comp list could be
-      created by calling the AI directly.
-      --> only input would then be the list... to be revisited
  *)

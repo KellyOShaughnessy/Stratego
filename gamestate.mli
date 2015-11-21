@@ -72,6 +72,9 @@ val print_game_board : game_board -> unit
 (* [piece_to_string piece] Converts the [piece] to the string representation *)
 val piece_to_string : piece -> bytes
 
+(* [piecelst_to_string piece] Converts a [piece list] to the string representation *)
+val piecelst_to_string: piece list -> bytes
+
 (* [print_gamestate gamestate]  *)
 val print_gamestate : gamestate -> unit
 
