@@ -26,10 +26,13 @@ type game_board = ((piece*player) option) array array *)
 type game_board = (location*((piece*player) option)) list
 
 type gamestate = {gb : game_board ; human : player;
-                  comp : player; turn: string}
+                  comp : player; turn: player}
+
+(* creates a game_board with all locations initilized to None *)
+val empty_game : unit -> game_board
 
 (* Initializes game state from user input and computer generated setup *)
-val new_game : location option -> piece option -> gamestate -> gamestate
+val new_game : player -> player -> gamestate
 
 (* Uses player assocation pieces record to get the location of a piece *)
 val get_location : player -> piece -> location
