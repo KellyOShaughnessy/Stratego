@@ -1,6 +1,6 @@
 type location = (int * int)
-and piece =
-  | Flag
+and piece = {pce:string; id:int; rank:int}
+(*   | Flag
   | Bomb
   | Spy of int
   | Scout of int
@@ -12,7 +12,7 @@ and piece =
   | Captain of int
   | Lieutenant of int
   | Sergeant of int
-  | Corporal of int
+  | Corporal of int *)
 and player = {name: bytes; pieces : (piece*location) list; graveyard : piece list}
 
 (* Using ocaml-matrix, make_matrix
@@ -26,7 +26,7 @@ type game_board = ((piece*player) option) array array *)
 type game_board = (location*((piece*player) option)) list
 
 type gamestate = {gb : game_board ; human : player;
-                  comp : player; turn: string}
+                  comp : player; turn: player}
 
 (* Initializes game state from user input and computer generated setup *)
 val new_game : location option -> piece option -> gamestate -> gamestate
