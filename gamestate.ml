@@ -79,7 +79,7 @@ let remove_from_board game_board player piece location =
 let rec remove_first_from_list piece lst =
   match lst with
   | [] -> []
-  | h::t -> if h=piece then let _ = Printf.printf "%s\n" (string_of_int piece.id) in t else h::remove_first_from_list piece t
+  | h::t -> if h=piece then t else h::remove_first_from_list piece t
 
 let add_to_board game_board player piece location =
   let new_graveyard = remove_first_from_list piece player.graveyard in
@@ -137,11 +137,31 @@ let move gamestate player piece end_location =
               {changed_gs with human = new_opp_player; comp = new_player})
           in
           (true, new_gs)
-      | Some pce -> failwith "TODO"
-(*           let (removed_start_gb, new_player) = remove_from_board game_board
+      | Some (pce,plyr) ->
+          let (removed_start_gb, new_player) = remove_from_board game_board
                                                 player piece start_location in
-          let (add_end_gb, newer_player) = add_to_board removed_start_gb
-                                            newer_player *)
+          if new_player.name="human" then
+            if plyr.name="human" then
+              let (add_end_gb, newer_player) = add_to_board removed_start_gb
+                                                  new_player pce
+                                                  end_location in
+              (true,{gamestate with human = newer_player; gb=add_end_gb})
+            else
+              let (add_end_gb, opp_player) = add_to_board removed_start_gb
+                                                  gamestate.comp pce
+                                                  end_location in
+              (true,{gamestate with human = new_player; comp=opp_player; gb=add_end_gb})
+          else
+            if plyr.name="comp" then
+              let (add_end_gb, newer_player) = add_to_board removed_start_gb
+                                                  new_player pce
+                                                  end_location in
+              (true,{gamestate with comp = newer_player; gb=add_end_gb})
+            else
+              let (add_end_gb, opp_player) = add_to_board removed_start_gb
+                                                  gamestate.comp pce
+                                                  end_location in
+              (true,{gamestate with comp = new_player; human=opp_player; gb=add_end_gb})
       )
 
   | (true, None) ->

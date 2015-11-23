@@ -172,10 +172,12 @@ let (new_gb1,hum1) = (remove_from_board game_board hum miner1 (1,8))
 TEST = (try List.assoc miner1 hum1.pieces with Not_found -> (-1,-1)) = (-1,-1)
 TEST = (List.assoc miner2 hum1.pieces) = (2,1)
 TEST = (List.mem miner1 hum1.graveyard) = true
+TEST = List.assoc (1,8) new_gb1 = None
 
 let (new_gb2, hum2) = (remove_from_board new_gb1 hum1 miner2 (2,1))
 TEST = (try List.assoc miner2 hum2.pieces with Not_found -> (-1,-1)) = (-1,-1)
-TEST =  (List.mem miner2 hum2.graveyard) = true
+TEST = (List.mem miner2 hum2.graveyard) = true
+TEST = List.assoc (2,1) new_gb2 = None
 
 (* Test add_to_board *)
 let (new_gb3, hum3) = (add_to_board new_gb1 hum2 miner1 (1,8))
@@ -191,5 +193,6 @@ let (new_gb4, hum4) = (add_to_board new_gb2 hum3 miner2 (2,1))
 TEST = (List.assoc miner2 hum4.pieces) = (2,1)
 TEST = (List.mem miner1 hum4.graveyard) = false
 TEST = (List.mem miner2 hum4.graveyard) = false
+TEST = List.assoc (2,1) new_gb4 = Some(miner2,hum4)
 
 let () = Pa_ounit_lib.Runtime.summarize()

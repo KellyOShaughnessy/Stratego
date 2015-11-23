@@ -46,7 +46,7 @@ val validate_move : game_board -> player -> piece -> location ->
 
 (* Returns the piece that "wins" the attack, or which piece will
 * remain on the game board *)
-val attack : piece -> piece -> (piece option)
+val attack : piece -> piece -> ((piece*player) option)
 
 val remove_from_board : game_board -> player -> piece -> location -> game_board*player
 
