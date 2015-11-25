@@ -1,8 +1,8 @@
 open Pervasives
 (* Gamestate mli *)
 type location = int * int
-type piece =
-  | Flag
+type piece = {pce:string ; id:int ; rank:int}
+  (*| Flag
   | Bomb
   | Spy of int
   | Scout of int
@@ -14,7 +14,7 @@ type piece =
   | Captain of int
   | Lieutenant of int
   | Sergeant of int
-  | Corporal of int
+  | Corporal of int *)
 
 and player = {name: bytes; pieces: (piece*location) list; graveyard: piece list}
 
@@ -33,31 +33,28 @@ let new_game location piece gamestate  = failwith "unimplemented"
 (* Uses player assocation pieces record to get the location of a piece
 get location. try with, and check if that piece is in the player's piece to chekc
 if my piece is actually on the board.*)
-let get_location player piece  = failwith "unimplemented"
+let get_location player piece  = (0,0)
 
 let on_gameboard dest =
   if ((fst dest) <= 10 && (fst dest) >0 && (snd dest) <=10 && (snd dest) >0) then true
   else false
 
 (*validates that the piece can move to the specified destination*)
-let simple_validate pl pc dest gb =
+let simple_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) : bool =
   let loc = get_location pl pc in
-    match loc,dest with
-    | (x1,y1),(x2,y2) -> (
-    (*TODO need to take absolute value*)
-      let xdist = x2-x1 in
-      let ydist = y2-y1 in
-      (*Check that only trying to move one space*)
-      if ((abs xdist) >1 || (abs ydist) >1) || ((abs xdist) =1 && (abs ydist) =1) ||
-        ((on_gameboard dest) =false) then false
-      else
-        let dest_piece = List.assoc dest gb in
-          match dest_piece with
-          | None -> true
-          | Some(x,y)->
-            if (y = pl) then false
-            else true
-          )
+  (*TODO need to take absolute value*)
+  let xdist = fst dest - fst loc in
+  let ydist = snd dest - snd loc in
+  (*Check that only trying to move one space*)
+  if ((abs xdist) >1 || (abs ydist) >1) || ((abs xdist) =1 && (abs ydist) =1) ||
+    ((on_gameboard dest) =false) then false
+  else
+    let dest_piece = List.assoc dest gb in
+      match dest_piece with
+      | None -> true
+      | Some(x,y)->
+        if (y = pl) then false
+        else true
 
 let get_piece (dest:location) (gb:game_board) : piece option =
   let dest_tup = List.assoc dest gb in
@@ -80,64 +77,58 @@ let rec check_intermediate (gb:game_board) (pl:player) (dir:string) (loc:locatio
       if y=pl then false
       else check_intermediate gb pl dir new_loc dest
 
-let captain_validate pl pc dest gb =
+let captain_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) : bool =
   let loc = get_location pl pc in
-    match loc,dest with
-    | (x1,y1),(x2,y2) -> (
-      (*TODO need to take absolute value?*)
-      let xdist = x2-x1 in
-      let axd = abs xdist in
-      let ydist = y2-y1 in
-      let ayd = abs ydist in
-      (*Check that only trying to move two spaces*)
-      if ((axd>2 || ayd>2) || (axd=1 && ayd<>0) || (axd=2 && ayd<>0)
-        || (ayd=1 && axd<>0) || (axd=2 && ayd<>0) || on_gameboard dest =false)
-         then false
-      else
-        (*get direction of movement*)
-        let dir =
-          if xdist=0 then (if min ydist 0 = ydist then "down" else "up")
-          else (if min xdist 0 = xdist then "left" else "right") in
-        let dest_piece = List.assoc dest gb in
-          match dest_piece with
-          | None -> check_intermediate gb pl dir loc dest
-          | Some(x,y)->
-            if (y = pl) then false
-            else check_intermediate gb pl dir (x1,y1) (x2,y2)
-          )
+  (*TODO need to take absolute value?*)
+  let xdist = fst dest - fst loc in
+  let axd = abs xdist in
+  let ydist = snd dest - snd loc in
+  let ayd = abs ydist in
+  (*Check that only trying to move two spaces*)
+  if ((axd>2 || ayd>2) || (axd=1 && ayd<>0) || (axd=2 && ayd<>0)
+    || (ayd=1 && axd<>0) || (axd=2 && ayd<>0) || on_gameboard dest =false)
+     then false
+  else
+    (*get direction of movement*)
+    let dir =
+      if xdist=0 then (if min ydist 0 = ydist then "down" else "up")
+      else (if min xdist 0 = xdist then "left" else "right") in
+    let dest_piece = List.assoc dest gb in
+      match dest_piece with
+      | None -> check_intermediate gb pl dir loc dest
+      | Some(x,y)->
+        if (y = pl) then false
+        else check_intermediate gb pl dir loc dest
 
-let scout_validate pl pc dest gb =
-    let loc = get_location pl pc in
-    match loc,dest with
-    | (x1,y1),(x2,y2) -> (
-      (*TODO need to take absolute value*)
-      let xdist = x2-x1 in
-      let ydist = y2-y1 in
-      (*Check that only trying to move in one direction that is contained on board*)
-      if ((xdist<>0 && ydist<>0) || on_gameboard dest =false)
-        then false
-      else
-        (*get direction of movement as (dir,destination starting point)*)
-        let dir =
-          if xdist=0 then (if min ydist 0 = ydist then "down" else "up")
-          else (if min xdist 0 = xdist then "left" else "right") in
-        let dest_piece = List.assoc dest gb in
-          match dest_piece with
-          | None -> check_intermediate gb pl dir loc dest
-          | Some(x,y)->
-            if (y = pl) then false
-            else check_intermediate gb pl dir loc dest
-          )
+let scout_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) : bool =
+  let loc = get_location pl pc in
+  (*TODO need to take absolute value*)
+  let xdist = fst dest - fst loc in
+  let ydist = snd dest - snd loc in
+  (*Check that only trying to move in one direction that is contained on board*)
+  if ((xdist<>0 && ydist<>0) || on_gameboard dest =false)
+    then false
+  else
+    (*get direction of movement as (dir,destination starting point)*)
+    let dir =
+      if xdist=0 then (if min ydist 0 = ydist then "down" else "up")
+      else (if min xdist 0 = xdist then "left" else "right") in
+    let dest_piece = List.assoc dest gb in
+      match dest_piece with
+      | None -> check_intermediate gb pl dir loc dest
+      | Some(x,y)->
+        if (y = pl) then false
+        else check_intermediate gb pl dir loc dest
 
 (* let loc_is_empty loc =
   if loc = None then true
   else false *)
 
-let gb_is_empty gb =
+let gb_is_empty (gb:game_board) : bool =
   if gb = [] then true
   else false
 
-let player_is_empty player =
+let player_is_empty (player:player) : bool =
   if player.name = "" || player.pieces = [] then true
   else false
 
@@ -149,48 +140,49 @@ let validate_move gb pl pc dest =
     (Printf.printf "Invalid move due to empty gameboard, player, or destination";
     (false, None))
   else(
-    match pc with
+    match pc.pce with
     (*All pieces can move one space in any direction unless otherwise specified.*)
-    | Flag -> (false,None)
-    | Bomb -> (false,None)
-    | Spy r ->
+    | "Flag" -> (false,None)
+    | "Bomb" -> (false,None)
+    | "Spy" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
     (*Can move any number of empty spaces in a straight line. Not diagonally or
      *through occupied spaces.*)
-    | Scout r ->
+    | "Scout" ->
       if scout_validate pl pc dest gb then (true,get_piece dest gb)
       else (false,None)
-    | Marshal r ->
+    | "Marshal" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
-    | General r ->
+    | "General" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
-    | Miner r ->
+    | "Miner" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
-    | Colonel r ->
+    | "Colonel" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
-    | Major r ->
+    | "Major" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
     (*Can move up to 2 spaces; and can choose to attack on the first or second
      * move. If attacking on the first move, the turn is over and piece does
      * not move another square.*)
-    | Captain r ->
+    | "Captain" ->
       if captain_validate pl pc dest gb then (true,get_piece dest gb)
       else (false,None)
-    | Lieutenant r ->
+    | "Lieutenant" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
-    | Sergeant r ->
+    | "Sergeant" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
-    | Corporal r ->
+    | "Corporal" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
+    | _ -> Printf.printf "Unrecognized piece name." ; (false,None)
     )
 
 (*check if its a flag or bomb before i call get_rank.
@@ -205,63 +197,13 @@ let attack piece1 piece2 = failwith "unimplemented"
 let move gamestate player piece location = failwith "unimplemented"
 
 let piece_to_string (piece:piece) =
-  match piece with
-  | Flag -> "Fla"
-  | Bomb -> "Bom"
-  | Spy x -> "Spy"
-  | Scout x -> "Sco"
-  | Marshal x -> "Mar"
-  | General x -> "Gen"
-  | Miner x -> "Min"
-  | Colonel x -> "Col"
-  | Major x -> "Maj"
-  | Captain x -> "Cap"
-  | Lieutenant x -> "Lie"
-  | Sergeant x -> "Ser"
-  | Corporal x -> "Cor"
+  failwith "unimplemented"
 
 let rec print_game_board (game_board:game_board)=
-  match game_board with
-  | [] -> ()
-  | ((col,row),some_piece)::t ->
-    let s1 =
-      (match some_piece with
-      | None -> "   "
-      | Some (piece,player) ->
-          if player.name="human" then
-            (piece_to_string piece)
-          else
-            "XXX")
-    in
-    let s2 =
-      (if col=1 && row!=10 then
-        "     "^
-        "-------------------------------------------------------------\n  "^
-        (string_of_int row)^"  | "^s1^" |"
-      else if col=1 && row=10 then
-        "     "^
-        "-------------------------------------------------------------\n "^
-        (string_of_int row)^"  | "^s1^" |"
-      else if col=10 then
-        " "^s1^" |\n"
-      else
-        " "^s1^" |")
-    in
-    let s3 =
-      (if row=1 && col=10 then
-        s2^
-        "     -------------------------------------------------------------\n"
-      else
-        s2
-      )
-    in
-    Printf.printf "%s" s3;
-    print_game_board t
+ failwith "unimplemented"
 
 let print_gamestate (gamestate:gamestate) =
-  print_game_board gamestate.gb;
-  Printf.printf
-    "        1     2     3     4     5     6     7     8     9    10\n\n";
+  failwith "unimplemented"
 
 
 
