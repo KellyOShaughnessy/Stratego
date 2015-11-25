@@ -1,3 +1,4 @@
+open Pervasives
 (* Gamestate mli *)
 type location = int * int
 type piece =
@@ -52,23 +53,76 @@ let simple_validate pl pc dest gb =
             if (y = pl) then false
             else true
           )
-    | _ -> false
 
-let captain_validate pl pc dest gb =
-  failwith "unimplemented"
-
-let scout_validate pl pc dest gb =
-  failwith "unimplemented"
-
-let get_piece dest gb =
+let get_piece (dest:location) (gb:game_board) : piece option =
   let dest_tup = List.assoc dest gb in
       match dest_tup with
       |None -> None
       |Some(x,y) -> Some(x)
 
-let loc_is_empty loc =
+(*Check intermediate spaces if moving 2 spaces*)
+let rec check_intermediate (gb:game_board) (pl:player) (dir:string) (loc:location)
+                            (dest:location) : bool =
+  if loc=dest then true
+  else
+    let new_loc = if dir = "up" then (fst loc, snd loc + 1) else
+                  if dir = "down" then (fst loc, snd loc - 1) else
+                  if dir = "right" then (fst dest +1, snd dest)
+                  else (fst dest -1, snd dest) in
+    let pc_tup = List.assoc new_loc gb in match pc_tup with
+    |None -> check_intermediate gb pl dir new_loc dest
+    |Some (x,y) ->
+      if y=pl then false
+      else check_intermediate gb pl dir new_loc dest
+
+let captain_validate pl pc dest gb =
+  let loc = get_location pl pc in
+    match loc,dest with
+    | (x1,y1),(x2,y2) -> (
+      (*TODO need to take absolute value*)
+      let xdist = x2-x1 in
+      let ydist = y2-y1 in
+      (*Check that only trying to move two spaces*)
+      if ((xdist>2 || ydist>2) || (xdist=1 && ydist<>0) || (xdist=2 && ydist<>0)
+        || (ydist=1 && xdist<>0) || (ydist=2 && ydist<>0)) then false
+      else
+        (*get direction of movement as (dir,destination starting point)*)
+        let dir =
+          if xdist=0 then (if min ydist 0 = ydist then "down" else "up")
+          else (if min xdist 0 = xdist then "left" else "right") in
+        let dest_piece = List.assoc dest gb in
+          match dest_piece with
+          | None -> check_intermediate gb pl dir loc dest
+          | Some(x,y)->
+            if (y = pl) then false
+            else check_intermediate gb pl dir (x1,y1) (x2,y2)
+          )
+
+let scout_validate pl pc dest gb =
+    let loc = get_location pl pc in
+    match loc,dest with
+    | (x1,y1),(x2,y2) -> (
+      (*TODO need to take absolute value*)
+      let xdist = x2-x1 in
+      let ydist = y2-y1 in
+      (*Check that only trying to move in one direction that is TODO contained on board*)
+      if (xdist<>0 && ydist<>0) then false
+      else
+        (*get direction of movement as (dir,destination starting point)*)
+        let dir =
+          if xdist=0 then (if min ydist 0 = ydist then "down" else "up")
+          else (if min xdist 0 = xdist then "left" else "right") in
+        let dest_piece = List.assoc dest gb in
+          match dest_piece with
+          | None -> check_intermediate gb pl dir loc dest
+          | Some(x,y)->
+            if (y = pl) then false
+            else check_intermediate gb pl dir loc dest
+          )
+
+(* let loc_is_empty loc =
   if loc = None then true
-  else false
+  else false *)
 
 let gb_is_empty gb =
   if gb = [] then true
@@ -82,7 +136,7 @@ let player_is_empty player =
   destination location*)
 let validate_move gb pl pc dest =
   (*check that no player, piece, game_board or location is empty *)
-  if (gb_is_empty gb || player_is_empty pl || loc_is_empty dest) then
+  if (gb_is_empty gb || player_is_empty pl) then
     (Printf.printf "Invalid move due to empty gameboard, player, or destination";
     (false, None))
   else(
@@ -96,7 +150,7 @@ let validate_move gb pl pc dest =
     (*Can move any number of empty spaces in a straight line. Not diagonally or
      *through occupied spaces.*)
     | Scout r ->
-      if scout_validate player piece dest gb then (true,get_piece dest gb)
+      if scout_validate pl pc dest gb then (true,get_piece dest gb)
       else (false,None)
     | Marshal r ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
@@ -117,7 +171,7 @@ let validate_move gb pl pc dest =
      * move. If attacking on the first move, the turn is over and piece does
      * not move another square.*)
     | Captain r ->
-      if captain_validate player piece dest gb then (true,get_piece dest gb)
+      if captain_validate pl pc dest gb then (true,get_piece dest gb)
       else (false,None)
     | Lieutenant r ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
@@ -128,9 +182,6 @@ let validate_move gb pl pc dest =
     | Corporal r ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
-    | _ ->
-      Printf.printf "Invalid move due to invalid piece type." ;
-      (false,None)
     )
 
 (*check if its a flag or bomb before i call get_rank.
