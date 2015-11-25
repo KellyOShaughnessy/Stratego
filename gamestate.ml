@@ -35,6 +35,10 @@ get location. try with, and check if that piece is in the player's piece to chek
 if my piece is actually on the board.*)
 let get_location player piece  = failwith "unimplemented"
 
+let on_gameboard dest =
+  if ((fst dest) <= 10 && (fst dest) >0 && (snd dest) <=10 && (snd dest) >0) then true
+  else false
+
 (*validates that the piece can move to the specified destination*)
 let simple_validate pl pc dest gb =
   let loc = get_location pl pc in
@@ -44,7 +48,8 @@ let simple_validate pl pc dest gb =
       let xdist = x2-x1 in
       let ydist = y2-y1 in
       (*Check that only trying to move one space*)
-      if (xdist>1 || ydist>1) || (xdist=1 && ydist=1) then false
+      if ((abs xdist) >1 || (abs ydist) >1) || ((abs xdist) =1 && (abs ydist) =1) ||
+        ((on_gameboard dest) =false) then false
       else
         let dest_piece = List.assoc dest gb in
           match dest_piece with
@@ -79,14 +84,17 @@ let captain_validate pl pc dest gb =
   let loc = get_location pl pc in
     match loc,dest with
     | (x1,y1),(x2,y2) -> (
-      (*TODO need to take absolute value*)
+      (*TODO need to take absolute value?*)
       let xdist = x2-x1 in
+      let axd = abs xdist in
       let ydist = y2-y1 in
+      let ayd = abs ydist in
       (*Check that only trying to move two spaces*)
-      if ((xdist>2 || ydist>2) || (xdist=1 && ydist<>0) || (xdist=2 && ydist<>0)
-        || (ydist=1 && xdist<>0) || (ydist=2 && ydist<>0)) then false
+      if ((axd>2 || ayd>2) || (axd=1 && ayd<>0) || (axd=2 && ayd<>0)
+        || (ayd=1 && axd<>0) || (axd=2 && ayd<>0) || on_gameboard dest =false)
+         then false
       else
-        (*get direction of movement as (dir,destination starting point)*)
+        (*get direction of movement*)
         let dir =
           if xdist=0 then (if min ydist 0 = ydist then "down" else "up")
           else (if min xdist 0 = xdist then "left" else "right") in
@@ -105,8 +113,9 @@ let scout_validate pl pc dest gb =
       (*TODO need to take absolute value*)
       let xdist = x2-x1 in
       let ydist = y2-y1 in
-      (*Check that only trying to move in one direction that is TODO contained on board*)
-      if (xdist<>0 && ydist<>0) then false
+      (*Check that only trying to move in one direction that is contained on board*)
+      if ((xdist<>0 && ydist<>0) || on_gameboard dest =false)
+        then false
       else
         (*get direction of movement as (dir,destination starting point)*)
         let dir =
