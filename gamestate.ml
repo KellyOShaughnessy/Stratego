@@ -33,9 +33,9 @@ let new_game location piece gamestate  = failwith "unimplemented"
 (* Uses player assocation pieces record to get the location of a piece
 get location. try with, and check if that piece is in the player's piece to chekc
 if my piece is actually on the board.*)
-let get_location player piece  = (0,0)
+let get_location player piece  = (2,7)
 
-let on_gameboard dest =
+let on_gameboard (dest:location) : bool =
   if ((fst dest) <= 10 && (fst dest) >0 && (snd dest) <=10 && (snd dest) >0) then true
   else false
 
@@ -137,9 +137,11 @@ let player_is_empty (player:player) : bool =
 let validate_move gb pl pc dest =
   (*check that no player, piece, game_board or location is empty *)
   if (gb_is_empty gb || player_is_empty pl) then
-    (Printf.printf "Invalid move due to empty gameboard, player, or destination";
+    (Printf.printf "Invalid move due to empty gameboard or player.";
     (false, None))
   else(
+    let loc = get_location pl pc in
+    if  loc = dest then (true, Some(pc)) else
     match pc.pce with
     (*All pieces can move one space in any direction unless otherwise specified.*)
     | "Flag" -> (false,None)
@@ -177,9 +179,6 @@ let validate_move gb pl pc dest =
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
     | "Sergeant" ->
-      if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
-      else (false,None)
-    | "Corporal" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
     | _ -> Printf.printf "Unrecognized piece name." ; (false,None)
