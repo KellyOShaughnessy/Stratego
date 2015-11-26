@@ -160,10 +160,6 @@ let game_board =
 ((1,10),Some ({pce="Captain";id=2;rank=8},hum));
 ]
 
-
-(*TEST =  (print_game_board game_board) = () *)
-(* let gamestate = {gb=game_board; human=hum; comp=computer; turn=hum} *)
-
 (* -------------------------TESTING VALIDATE_MOVE---------------------------- *)
 (*TODO CANNOT COMPLETE TESTING UNTIL GET LOCATION IS DONE*)
 let sp1 = {pce="Spy";id=1;rank=1}
@@ -227,16 +223,16 @@ TEST "Scout" = (validate_move game_board hum sc1 (2,9)) = (false,None)
 TEST "Scout" = (validate_move game_board hum sc1 (3,7)) = (true,None)
 TEST "Scout" = (validate_move game_board hum sc1 (4,7)) = (true,None)
 TEST "Scout" = (validate_move game_board hum sc1 (2,8)) = (false,None)
-TEST "Scout" = (validate_move game_board hum sc1 (10,7)) = (false,s1)
-TEST "Scout" = (validate_move game_board hum sc1 (9,7)) = (true,co1)
+TEST "Scout" = (validate_move game_board hum sc1 (10,7)) = (false,Some(sc1))
+TEST "Scout" = (validate_move game_board hum sc1 (9,7)) = (true,Some(co1))
 TEST "Scout" = (validate_move game_board hum sc1 (8,7)) = (false,None)
 
 (* Tests that Captain can move up to two squares in the same direction *)
 (*TODO: cannot test successus until captain has moved*)
-TEST "Captain" = (validate_move game_board hum cap1 (1,5)) = (false,co1)
-TEST "Captain" = (validate_move game_board hum cap2 (3,3)) = (false,co1)
-TEST "Captain" = (validate_move game_board hum cap1 (1,4)) = (false,co1)
-TEST "Captain" = (validate_move game_board hum cap2 (2,3)) = (false,co1)
+TEST "Captain" = (validate_move game_board hum cap1 (1,5)) = (false,None)
+TEST "Captain" = (validate_move game_board hum cap2 (3,3)) = (false,None)
+TEST "Captain" = (validate_move game_board hum cap1 (1,4)) = (false,None)
+TEST "Captain" = (validate_move game_board hum cap2 (2,3)) = (false,None)
 
 (* Tests that piece can move when destination piece is empty *)
 
@@ -249,5 +245,41 @@ TEST "Captain" = (validate_move game_board hum cap2 (2,3)) = (false,co1)
 
 (* Tests that piece cannot move when destination piece contains opponent's piece
  * but intermediate pieces are non-empty [for scout and captain] *)
+
+
+(*-----------------------------Robyn Testing----------------------------------*)
+(* TEST =  (print_game_board game_board) = () *)
+(* let gamestate = {gb=game_board; human=hum; comp=computer; turn=hum} *)
+
+(* Tests that we got rid of the right piece from human pieces list *)
+let miner1 = {pce="Miner";id=1;rank=2}
+let miner2 = {pce="Miner";id=2;rank=2}
+
+let (new_gb1,hum1) = (remove_from_board game_board hum miner1 (1,8))
+TEST = (try List.assoc miner1 hum1.pieces with Not_found -> (-1,-1)) = (-1,-1)
+TEST = (List.assoc miner2 hum1.pieces) = (2,1)
+TEST = (List.mem miner1 hum1.graveyard) = true
+TEST = List.assoc (1,8) new_gb1 = None
+
+let (new_gb2, hum2) = (remove_from_board new_gb1 hum1 miner2 (2,1))
+TEST = (try List.assoc miner2 hum2.pieces with Not_found -> (-1,-1)) = (-1,-1)
+TEST = (List.mem miner2 hum2.graveyard) = true
+TEST = List.assoc (2,1) new_gb2 = None
+
+(* Test add_to_board *)
+let (new_gb3, hum3) = (add_to_board new_gb1 hum2 miner1 (1,8))
+TEST = (List.assoc miner1 hum3.pieces) = (1,8)
+TEST = (List.mem miner1 hum3.graveyard) = false
+TEST = (List.mem miner2 hum3.graveyard) = true
+
+(* tests that the game board references the piece and the new player *)
+TEST = (List.assoc (1,8) new_gb3) = Some (miner1, hum3)
+TEST = (List.assoc (2,2) new_gb3) = Some ({pce="Marshal";id=1;rank=9}, hum3)
+
+let (new_gb4, hum4) = (add_to_board new_gb2 hum3 miner2 (2,1))
+TEST = (List.assoc miner2 hum4.pieces) = (2,1)
+TEST = (List.mem miner1 hum4.graveyard) = false
+TEST = (List.mem miner2 hum4.graveyard) = false
+TEST = List.assoc (2,1) new_gb4 = Some(miner2,hum4)
 
 let () = Pa_ounit_lib.Runtime.summarize()
