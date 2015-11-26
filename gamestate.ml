@@ -1,4 +1,6 @@
 (* Gamestate mli *)
+
+(*playing around to see if branching works*)
 type location = int * int
 type piece =
   | Flag
@@ -17,8 +19,23 @@ type piece =
 
 and player = {name: bytes; pieces: (piece*location) list; graveyard: piece list}
 
-(*function that gets rank of the piece so that in attack, it can match on the rankings.
-get_rank keep in mind flag and bomb*)
+(*function that gets rank of the piece so that in attack, it can match on the rankings
+keep in mind flag and bomb. *)
+let get_rank piece : int =
+  match piece with
+  | Flag -> 1
+  | Bomb -> 0
+  | Spy  -> 2
+  | Scout -> 3
+  | Marshal -> 12
+  | General -> 11
+  | Miner -> 4
+  | Colonel -> 10
+  | Major -> 9
+  | Captain -> 8
+  | Lieutenant -> 7
+  | Sergeant -> 6
+  | Corporal -> 5
 
 (* piece is the piece in that location with the string of the player,
 * None if location is empty *)
