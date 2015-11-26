@@ -19,10 +19,9 @@ type piece =
 
 and player = {name: bytes; pieces: (piece*location) list; graveyard: piece list}
 
-(*function that gets rank of the piece so that in attack, it can match on the rankings
-keep in mind flag and bomb. *)
-let get_rank piece : int =
-  match piece with
+(*get the rank of the piece during attack *)
+let get_rank (pce : piece) : int =
+  match pce with
   | Flag -> 1
   | Bomb -> 0
   | Spy  -> 2
