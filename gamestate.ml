@@ -20,21 +20,22 @@ and piece = {pce:string; id:int; rank:int}
 and player = {name: bytes; pieces: (piece*location) list; graveyard: piece list}
 
 (*get the rank of the piece during attack *)
-let get_rank (pce : piece) : int =
-  match pce with
-  | Flag -> 1
-  | Bomb -> 0
-  | Spy  -> 2
-  | Scout -> 3
-  | Marshal -> 12
-  | General -> 11
-  | Miner -> 4
-  | Colonel -> 10
-  | Major -> 9
-  | Captain -> 8
-  | Lieutenant -> 7
-  | Sergeant -> 6
-  | Corporal -> 5
+let get_rank (piece:piece) : int =
+  match piece.pce with
+  | "Flag" -> 1
+  | "Bomb" -> 0
+  | "Spy" -> 2
+  | "Scout" -> 3
+  | "Marshal" -> 12
+  | "General" -> 11
+  | "Miner" -> 4
+  | "Colonel" -> 10
+  | "Major" -> 9
+  | "Captain" -> 8
+  | "Lieutenant" -> 7
+  | "Sergeant" -> 6
+  | "Corporal" -> 5
+  | _ -> failwith "not a piece"
 
 (* piece is the piece in that location with the string of the player,
 * None if location is empty *)
