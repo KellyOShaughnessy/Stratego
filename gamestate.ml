@@ -3,19 +3,6 @@
 (*playing around to see if branching works*)
 type location = int * int
 and piece = {pce:string; id:int; rank:int}
-(*   | Flag
-  | Bomb
-  | Spy of int
-  | Scout of int
-  | Marshal of int
-  | General of int
-  | Miner of int
-  | Colonel of int
-  | Major of int
-  | Captain of int
-  | Lieutenant of int
-  | Sergeant of int
-  | Corporal of int *)
 
 and player = {name: bytes; pieces: (piece*location) list; graveyard: piece list}
 
@@ -49,7 +36,33 @@ let new_game location piece gamestate  = failwith "unimplemented"
 (* Uses player assocation pieces record to get the location of a piece
 get location. try with, and check if that piece is in the player's piece to chekc
 if my piece is actually on the board.*)
-let get_location  player  piece  = failwith "unimplemented"
+let get_location  (pl: player)  (pc: piece) : location  =
+  (*Find piece.pce string in graveyard piece list. If the piece
+  is there then raise error because you can't get the location of it.
+  If it is not there, then return snd of piece.pieces  *)
+  let exists k l =
+    List.fold_left(
+      fun a x -> if x ==k then true else a)
+      false l;;
+  let pc_ex = exists pc (pl.graveyard) in
+    match pc_ex with
+    |true -> failwith "piece is in graveyard"
+    |false ->
+
+
+
+let get_piece (dest:location) (gb:game_board) : piece option =
+  let dest_tup = List.assoc dest gb in
+      match dest_tup with
+      |None -> None
+      |Some(x,y) -> Some(x)
+
+
+# let lookup_weight ~compute_weight alist key =
+    match List.Assoc.find alist key with
+    | None -> 0.
+    | Some data -> compute_weight data ;;
+
 
 let validate_move game_board player piece location = failwith "unimplemented"
 
