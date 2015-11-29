@@ -51,12 +51,6 @@ let get_location  (pl: player)  (pc: piece) : location  =
                   | _ -> failwith "error in get_location"
 
 
-# let lookup_weight ~compute_weight alist key =
-    match List.Assoc.find alist key with
-    | None -> 0.
-    | Some data -> compute_weight data ;;
-
-
 let validate_move game_board player piece location = failwith "unimplemented"
 
 (*check if its a flag or bomb before i call get_rank.
