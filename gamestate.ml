@@ -24,8 +24,7 @@ let get_rank (piece:piece) : int =
   | "Corporal" -> 5
   | _ -> failwith "not a piece"
 
-(* piece is the piece in that location with the string of the player,
-* None if location is empty *)
+
 and game_board = (location*((piece*player) option)) list
 
 and gamestate = {gb: game_board ; human: player; comp: player; turn: player}
@@ -37,9 +36,9 @@ let new_game location piece gamestate  = failwith "unimplemented"
 get location. try with, and check if that piece is in the player's piece to chekc
 if my piece is actually on the board.*)
 let get_location  (pl: player)  (pc: piece) : location  =
-  (*Find piece.pce string in graveyard piece list. If the piece
+  (*Find piece in graveyard piece list. If the piece
   is there then raise error because you can't get the location of it.
-  If it is not there, then return snd of piece.pieces  *)
+  If it is not there, then return snd of piece.pieces in the player's list  *)
   let exists k l =
     List.fold_left(
       fun a x -> if x ==k then true else a)
@@ -47,15 +46,11 @@ let get_location  (pl: player)  (pc: piece) : location  =
   let pc_ex = exists pc (pl.graveyard) in
     match pc_ex with
     |true -> failwith "piece is in graveyard"
-    |false ->
+    |false -> let loc_tup = List.assoc pc pl.pieces in
+                  match loc_tup with
+                  |(x,y) -> y
+                  | _ -> failwith "error in get_location"
 
-
-
-let get_piece (dest:location) (gb:game_board) : piece option =
-  let dest_tup = List.assoc dest gb in
-      match dest_tup with
-      |None -> None
-      |Some(x,y) -> Some(x)
 
 
 # let lookup_weight ~compute_weight alist key =
