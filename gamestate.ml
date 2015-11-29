@@ -1,6 +1,5 @@
-(* Gamestate mli *)
+(*Gamestate.ml*)
 
-(*playing around to see if branching works*)
 type location = int * int
 and piece = {pce:string; id:int; rank:int}
 
@@ -52,7 +51,6 @@ let get_location  (pl: player)  (pc: piece) : location  =
                   | _ -> failwith "error in get_location"
 
 
-
 # let lookup_weight ~compute_weight alist key =
     match List.Assoc.find alist key with
     | None -> 0.
@@ -67,8 +65,27 @@ otherwise piece leaves and bomb leaves too.
 and then the three cases of rankings. if flag, then win the game.
 
 piece1 is my piece
-piece2 is the piece that was on the tile. *)
-let attack piece1 piece2 = failwith "unimplemented"
+piece2 is the piece that was on the tile.
+
+piece -> piece -> ((piece*player) option)*)
+let attack piece1 piece2 =
+  match piece2.pce with
+  | "Bomb" -> match piece1.pce with
+             | "Miner" -> piece1
+             | "Bomb" -> failwith "bomb and bomb attack"
+             | _ -> failwith "remove piece1 from board. put into player Graveyard"
+  | "Flag" -> failwith "game is won.. new_game?"
+  | _ -> (if get_rank piece1 <= get_rank piece2 then Some piece2 else Some piece1)
+
+
+(*check if piece 2 is a bomb or miner. if piece piece 2 is bomb
+and piece 1 in miner, then miner takes that tile. bomb leaves.
+otherwise both piece 1 and piece 2 = bomb leave. piece 1 goes into graveyard
+remove_from_board game_board, piece1 location
+
+1. if piece2 = flag then game is won
+2. if piece1 rank < piece 2 rank, piece 1 goes to graveyard
+2. piece1 rank > piece2 rank then piece2 graveyard, piece 1 on that location*)
 
 
 let remove_from_board game_board player piece location =
