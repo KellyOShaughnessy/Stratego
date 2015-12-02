@@ -1,7 +1,7 @@
 (*Gamestate.ml*)
 
 type location = int * int
-and piece = {pce:string; id:int; rank:int}
+and piece = {pce:string; id:int}
 
 and player = {name: bytes; pieces: (piece*location) list; graveyard: piece list}
 
@@ -61,15 +61,19 @@ and then the three cases of rankings. if flag, then win the game.
 piece1 is my piece
 piece2 is the piece that was on the tile.
 
-piece -> piece -> ((piece*player) option)*)
+piece -> piece -> ((piece*player) option)
+
+ Some(piece1,player)
+*)
 let attack piece1 piece2 =
   match piece2.pce with
   | "Bomb" -> match piece1.pce with
-             | "Miner" -> piece1
-             | "Bomb" -> failwith "bomb and bomb attack"
-             | _ -> failwith "remove piece1 from board. put into player Graveyard"
+             | "Miner" -> Some piece1
+             | _ -> None
   | "Flag" -> failwith "game is won.. new_game?"
-  | _ -> (if get_rank piece1 <= get_rank piece2 then Some piece2 else Some piece1)
+  | _ -> (if get_rank piece1 < get_rank piece2 then Some piece2
+          else if get_rank piece1 > get_rank piece2 then Some piece1
+          else None
 
 
 (*check if piece 2 is a bomb or miner. if piece piece 2 is bomb
