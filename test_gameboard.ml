@@ -160,7 +160,94 @@ let game_board =
 ((1,10),Some ({pce="Captain";id=2;rank=8},hum));
 ]
 
+(* -------------------------TESTING VALIDATE_MOVE---------------------------- *)
+(*TODO CANNOT COMPLETE TESTING UNTIL GET LOCATION IS DONE*)
+let sp1 = {pce="Spy";id=1;rank=1}
+let sc1 = {pce="Scout";id=1;rank=2}
+let cap1 = {pce="Captain";id=1;rank=3}
+let maj1 = {pce="Major";id=1;rank=4}
+let f1 = {pce="Flag";id=1;rank=0}
+let ser1 = {pce="Sergeant";id=1;rank=5}
+let co1 = {pce="Colonel";id=1;rank=6}
+let mi1 = {pce="Miner";id=1;rank=2}
+let g1 = {pce="General";id=1;rank=7}
+let cap2 = {pce="Captain";id=2;rank=8}
+let mi2 = {pce="Miner";id=2;rank=2}
+let ma1 = {pce="Marshal";id=1;rank=9}
+let l1 = {pce="Lieutenant";id=1;rank=6}
+let b1 = {pce="Bomb";id=1;rank=0}
+let b2 = {pce="Bomb";id=2;rank=0}
+let b3 = {pce="Bomb";id=3;rank=0}
+let sc2 = {pce="Scout";id=2;rank=2}
+let l2 = {pce="Lieutenant";id=2;rank=6}
+let ser2 = {pce="Sergeant";id=2;rank=5}
+let sc3 = {pce="Scout";id=3;rank=2}
 
+(* Tests that Bomb and Flag cannot move *)
+TEST = (validate_move game_board hum b1 (2,5)) = (false,None)
+TEST = (validate_move game_board hum b2 (2,7)) = (false,None)
+TEST = (validate_move game_board hum f1 (3,1)) = (false,None)
+
+(* Tests that piece can "move" to its current location [if not bomb/flag] *)
+TEST "no-move" = (validate_move game_board hum sp1 (1,1)) = (true,Some(sp1))
+TEST "no-move" = (validate_move game_board hum sc1 (2,7)) = (true,Some(sc1))
+TEST "no-move" = (validate_move game_board hum sc2 (2,10)) = (true,Some(sc2))
+TEST "no-move" = (validate_move game_board hum cap1 (1,3)) = (true,Some(cap1))
+TEST "no-move" = (validate_move game_board hum cap2 (1,10)) = (true,Some(cap2))
+
+(* Tests that Spy, Marshal, General, Miner, Colonel, Major, Lieutenant, Sergeant
+ * cannot move more than one square *)
+TEST "big move" = (validate_move game_board hum sp1 (2,2)) = (false,None)
+TEST "big move" = (validate_move game_board hum ma1 (3,4)) = (false,None)
+TEST "big move" = (validate_move game_board hum g1 (3,9)) = (false,None)
+TEST "big move" = (validate_move game_board hum mi2 (1,9)) = (false,None)
+TEST "big move" = (validate_move game_board hum mi1 (2,1)) = (false,None)
+TEST "big move" = (validate_move game_board hum co1 (2,8)) = (false,None)
+TEST "big move" = (validate_move game_board hum maj1 (0,0)) = (false,None)
+TEST "big move" = (validate_move game_board hum l1 (3,8)) = (false,None)
+TEST "big move" = (validate_move game_board hum ser2 (1,9)) = (false,None)
+
+(* Tests that Scout can move up to as many squares that the size of the game board
+ * allows. *)
+(*Move off gameboard -> false*)
+TEST "Scout" = (validate_move game_board hum sc1 (10,11)) = (false,None)
+TEST "Scout" = (validate_move game_board hum sc2 (11,10)) = (false,None)
+TEST "Scout" = (validate_move game_board hum sc3 (9,14)) = (false,None)
+(*Move in multiple directions -> false*)
+TEST "Scout" = (validate_move game_board hum sc1 (3,8)) = (false,None)
+TEST "Scout" = (validate_move game_board hum sc1 (4,9)) = (false,None)
+TEST "Scout" = (validate_move game_board hum sc1 (10,8)) = (false,None)
+
+TEST "Scout" = (validate_move game_board hum sc1 (2,8)) = (false,None)
+TEST "Scout" = (validate_move game_board hum sc1 (2,9)) = (false,None)
+TEST "Scout" = (validate_move game_board hum sc1 (3,7)) = (true,None)
+TEST "Scout" = (validate_move game_board hum sc1 (4,7)) = (true,None)
+TEST "Scout" = (validate_move game_board hum sc1 (2,8)) = (false,None)
+TEST "Scout" = (validate_move game_board hum sc1 (10,7)) = (false,Some(sc1))
+TEST "Scout" = (validate_move game_board hum sc1 (9,7)) = (true,Some(co1))
+TEST "Scout" = (validate_move game_board hum sc1 (8,7)) = (false,None)
+
+(* Tests that Captain can move up to two squares in the same direction *)
+(*TODO: cannot test successus until captain has moved*)
+TEST "Captain" = (validate_move game_board hum cap1 (1,5)) = (false,None)
+TEST "Captain" = (validate_move game_board hum cap2 (3,3)) = (false,None)
+TEST "Captain" = (validate_move game_board hum cap1 (1,4)) = (false,None)
+TEST "Captain" = (validate_move game_board hum cap2 (2,3)) = (false,None)
+
+(* Tests that piece can move when destination piece is empty *)
+
+(* Tests that piece can move when destination piece contains opponents piece *)
+
+(* Tests that piece cannot move when destination piece contains own piece *)
+
+(* Tests that piece cannot move when destination piece is empty but
+ * intermediate pieces are non-empty [for scout and captain] *)
+
+(* Tests that piece cannot move when destination piece contains opponent's piece
+ * but intermediate pieces are non-empty [for scout and captain] *)
+
+
+(*-----------------------------Robyn Testing----------------------------------*)
 (* TEST =  (print_game_board game_board) = () *)
 (* let gamestate = {gb=game_board; human=hum; comp=computer; turn=hum} *)
 
