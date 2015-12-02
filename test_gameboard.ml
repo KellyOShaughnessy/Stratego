@@ -282,19 +282,103 @@ TEST = (List.mem mi1 hum4.graveyard) = false
 TEST = List.assoc (2,1) new_gb4 = Some(mi1,hum4)
 
 (* test move *)
-(* let move gamestate player piece end_location = *)
-TEST =  (print_game_board game_board) = ()
+
+(* TEST =  (print_game_board game_board) = () *)
+
+(* Tests that we can move and update properly up *)
 let gamestate = {gb=game_board; human=hum; comp=computer; turn=hum}
-let (boolean, new_gamestate1) = move gamestate gamestate.human mi1 (3,1)
+let (_, new_gamestate1) = move gamestate gamestate.human mi1 (3,1)
+TEST = (List.assoc (2,1) new_gamestate1.gb) = None
 TEST = (List.assoc (3,1) new_gamestate1.gb) = (Some(mi1,new_gamestate1.human))
 TEST = (List.assoc mi1 new_gamestate1.human.pieces) = (3,1)
 TEST = (List.mem mi1 new_gamestate1.human.graveyard) = false
 
-let (boolean, new_gamestate2) = move new_gamestate1 new_gamestate1.human mi1 (3,2)
+(* Tests that we can move and update properly right *)
+let (_, new_gamestate2) = move new_gamestate1 new_gamestate1.human mi1 (3,2)
+TEST = (List.assoc (3,1) new_gamestate2.gb) = None
 TEST = (List.assoc (3,2) new_gamestate2.gb) = (Some(mi1,new_gamestate2.human))
 TEST = (List.assoc mi1 new_gamestate2.human.pieces) = (3,2)
 TEST = (List.mem mi1 new_gamestate2.human.graveyard) = false
 
-(* let (boolean, sc_gamestate) = move gamestate hum *)
+(* Tests that we can move human up and win attack on computer piece *)
+let (_, gs1) = move new_gamestate1 new_gamestate1.human mi1 (4,1)
+let (_, gs2) = move gs1 gs1.human mi1 (5,1)
+let (_, gs3) = move gs2 gs2.human mi1 (6,1)
+let (_, gs4) = move gs3 gs3.human mi1 (7,1)
+let (_, gs5) = move gs4 gs4.human mi1 (8,1)
+let (_, gs6) = move gs5 gs5.human mi1 (9,1)
+TEST = (List.assoc (9,1) gs6.gb) = Some(mi1,gs6.human)
+TEST = (List.assoc mi1 gs6.human.pieces) = (9,1)
+TEST = (List.mem sp1 gs6.comp.graveyard) = true
+
+(* Tests that we can move human up and tie attack with removing both pieces *)
+let (_,gs7) = move gs6 gs6.human mi1 (10,1)
+TEST = (List.assoc (10,1) gs7.gb) = None
+TEST = (try List.assoc mi1 gs7.human.pieces with Not_found -> (-1,-1)) = (-1,-1)
+TEST = (try List.assoc mi2 gs7.comp.pieces with Not_found -> (-1,-1)) = (-1,-1)
+TEST = (List.mem mi1 gs7.human.graveyard) = true
+TEST = (List.mem mi2 gs7.comp.graveyard) = true
+
+(* Tests move computer down and hit human bomb, both leave *)
+let (_, gs_1) = move gamestate gamestate.comp ser1 (8,6)
+let (_, gs_2) = move gs_1 gs_1.comp ser1 (7,6)
+let (_, gs_3) = move gs_2 gs_2.comp ser1 (6,6)
+let (_, gs_4) = move gs_3 gs_3.comp ser1 (5,6)
+let (_, gs_5) = move gs_4 gs_4.comp ser1 (4,6)
+let (_, gs_6) = move gs_5 gs_5.comp ser1 (3,6)
+let (_, gs_7) = move gs_6 gs_6.comp ser1 (2,6)
+TEST = (List.assoc (2,6) gs_7.gb) = None
+TEST = (try List.assoc ser1 gs_7.comp.pieces with Not_found -> (-1,-1)) = (-1,-1)
+TEST = (try List.assoc b3 gs_7.human.pieces with Not_found -> (-1,-1)) = (-1,-1)
+TEST = (List.mem ser1 gs_7.comp.graveyard) = true
+TEST = (List.mem b3 gs_7.human.graveyard) = true
+
+(* Test that we can't move a piece if there's another piece for the same player in the way *)
+let (boolean, same_gs) = move gamestate gamestate.comp mi2 (9,1)
+TEST = (boolean) = false
+TEST = same_gs = gamestate
+
+(* Test that miner hits a bomb stays on board *)
+let (_,gs_1) = move gamestate gamestate.comp mi1 (8,8)
+let (_,gs_2) = move gs_1 gs_1.comp mi1 (7,8)
+let (_,gs_3) = move gs_2 gs_2.comp mi1 (6,8)
+let (_,gs_4) = move gs_3 gs_3.comp mi1 (5,8)
+let (_,gs_5) = move gs_4 gs_4.comp mi1 (4,8)
+let (_,gs_6) = move gs_5 gs_5.comp mi1 (3,8)
+let (_,gs_7) = move gs_6 gs_6.comp mi1 (3,7)
+let (_,gs_8) = move gs_7 gs_7.comp mi1 (3,6)
+let (_,gs_9) = move gs_8 gs_8.comp mi1 (2,6)
+TEST = (List.assoc (2,6) gs_9.gb) = Some(mi1,gs_9.comp)
+TEST = (List.assoc mi1 gs_9.comp.pieces) = (2,6)
+TEST = (List.mem b3 gs_9.human.graveyard) = true
+TEST = (try List.assoc b3 gs_9.human.pieces with Not_found -> (-1,-1)) = (-1,-1)
+
+(* Test the computer attacks human piece and wins *)
+let (_,gs_7_down) = move gs_7 gs_7.comp mi1 (2,7)
+TEST = (List.assoc (2,7) gs_7_down.gb) = Some(mi1,gs_7_down.comp)
+TEST = (List.assoc mi1 gs_7_down.comp.pieces) = (2,7)
+TEST = (List.mem sc2 gs_7_down.human.graveyard) = true
+TEST = (try List.assoc sc2 gs_7_down.human.pieces with Not_found -> (-1,-1)) = (-1,-1)
+
+(* Test that computer attacks human piece and loses *)
+let (_,gs_6_down) = move gs_6 gs_6.comp mi1 (2,8)
+TEST = (List.assoc (2,8) gs_6_down.gb) = Some(l2,gs_6_down.human)
+TEST = (List.assoc l2 gs_6_down.human.pieces) = (2,8)
+TEST = (List.mem mi1 gs_6_down.comp.graveyard) = true
+TEST = (try List.assoc mi1 gs_6_down.comp.pieces with Not_found -> (-1,-1)) = (-1,-1)
+
+(* Test that invalid move of 2 spaces for a piece that can't do that *)
+let (boolean,gs_1_no) = move gamestate gamestate.comp mi1 (6,8)
+TEST = boolean = false
+TEST = gs_1_no = gamestate
+
+
+TEST =  (print_game_board gamestate.gb) = ()
+
+
+(* let (boolean, sc_gamestate) = move gamestate hum sc3 (6,10)
+TEST = (List.assoc (6,10) sc_gamestate.gb) = Some(sc3,sc_gamestate.human)
+TEST = (List.assoc (2,10) sc_gamestate.gb) = None
+TEST = (List.assoc sc3 sc_gamestate.human.pieces) = (6,10) *)
 
 let () = Pa_ounit_lib.Runtime.summarize()
