@@ -24,7 +24,7 @@ let get_rank (piece:piece) : int =
   | _ -> failwith "not a piece"
 
 
-and game_board = (location*((piece*player) option)) list
+type game_board = (location*((piece*player) option)) list
 
 and gamestate = {gb: game_board ; human: player; comp: player; turn: player}
 
@@ -41,15 +41,11 @@ let get_location  (pl: player)  (pc: piece) : location  =
   let exists k l =
     List.fold_left(
       fun a x -> if x ==k then true else a)
-      false l;;
+      false l in
   let pc_ex = exists pc (pl.graveyard) in
     match pc_ex with
     |true -> failwith "piece is in graveyard"
-    |false -> let loc_tup = List.assoc pc pl.pieces in
-                  match loc_tup with
-                  |(x,y) -> y
-                  | _ -> failwith "error in get_location"
-
+    |false -> try List.assoc pc pl.pieces with Not_found -> failwith "error in get_location"
 
 let validate_move game_board player piece location = failwith "unimplemented"
 
@@ -65,15 +61,15 @@ piece -> piece -> ((piece*player) option)
 
  Some(piece1,player)
 *)
-let attack piece1 piece2 =
+let attack piece1 piece2 p1 p2 =
   match piece2.pce with
-  | "Bomb" -> match piece1.pce with
-             | "Miner" -> Some piece1
-             | _ -> None
+  | "Bomb" -> (match piece1.pce with
+             | "Miner" -> Some (piece1, p1)
+             | _ -> None)
   | "Flag" -> failwith "game is won.. new_game?"
-  | _ -> (if get_rank piece1 < get_rank piece2 then Some piece2
-          else if get_rank piece1 > get_rank piece2 then Some piece1
-          else None
+  | _ -> (if get_rank piece1 < get_rank piece2 then Some (piece2, p2)
+          else if get_rank piece1 > get_rank piece2 then Some (piece1,p1)
+          else None)
 
 
 (*check if piece 2 is a bomb or miner. if piece piece 2 is bomb
@@ -162,7 +158,8 @@ let move gamestate player piece end_location =
   let game_board = gamestate.gb in
   match validate_move game_board player piece end_location with
   | (true, Some opp_piece) ->
-      (match attack piece opp_piece with
+    let opp_player = (if player.name ="human" then gamestate.comp else gamestate.human) in
+      (match attack piece opp_piece player opp_player with
       | None ->
           let (removed_start_gb, new_player) = remove_from_board game_board
                                                 player piece start_location in
