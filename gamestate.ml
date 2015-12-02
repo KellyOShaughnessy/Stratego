@@ -37,14 +37,10 @@ let get_location  (pl: player)  (pc: piece) : location  =
   (*Find piece in graveyard piece list. If the piece
   is there then raise error because you can't get the location of it.
   If it is not there, then return snd of piece.pieces in the player's list  *)
-  let exists k l =
-    List.fold_left(
-      fun a x -> if x ==k then true else a)
-      false l in
-  let pc_ex = exists pc (pl.graveyard) in
-    match pc_ex with
-    |true -> failwith "piece is in graveyard"
-    |false -> try List.assoc pc pl.pieces with Not_found -> failwith "error in get_location"
+  try
+    List.assoc pc pl.pieces
+  with
+  | Not_found -> failwith "error in get_location"
 
 
 (*Checks that piece isn't trying to move off of gameboard*)
