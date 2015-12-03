@@ -3,7 +3,7 @@
 type location = int * int
 and piece = {pce:string; id:int}
 
-and player = {name: bytes; pieces: (piece*location) list; graveyard: piece list}
+and player = {name: bytes; pieces: (piece*location) list; graveyard: piece list; won: bool}
 
 (*get the rank of the piece during attack *)
 let get_rank (piece:piece) : int =
