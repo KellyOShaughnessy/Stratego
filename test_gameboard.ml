@@ -381,12 +381,50 @@ TEST = boolean = false
 TEST = gs_1_no = gamestate
 
 
-TEST =  (print_game_board gamestate.gb) = ()
+(* TEST =  (print_game_board gamestate.gb) = () *)
 
-
-(* let (boolean, sc_gamestate) = move gamestate hum sc3 (6,10)
+(* Test that scout can move up properly *)
+let (boolean, sc_gamestate) = move gamestate hum sc3 (6,10)
 TEST = (List.assoc (6,10) sc_gamestate.gb) = Some(sc3,sc_gamestate.human)
 TEST = (List.assoc (2,10) sc_gamestate.gb) = None
-TEST = (List.assoc sc3 sc_gamestate.human.pieces) = (6,10) *)
+TEST = (List.assoc sc3 sc_gamestate.human.pieces) = (6,10)
+
+(* Test that scout can move sideways properly *)
+let (boolean, sc_gamestate_left) = move sc_gamestate sc_gamestate.human sc3 (6,2)
+TEST = (List.assoc (6,2) sc_gamestate_left.gb) = Some(sc3,sc_gamestate_left.human)
+TEST = (List.assoc (6,10) sc_gamestate_left.gb) = None
+TEST = (List.assoc sc3 sc_gamestate_left.human.pieces) = (6,2)
+
+(* Test that scout can attack *)
+let (_, sc_gamestate2) = move sc_gamestate sc_gamestate.human sc3 (9,10)
+TEST = (List.assoc (9,10) sc_gamestate2.gb) = Some(cap2,sc_gamestate2.comp)
+TEST = (List.assoc (6,10) sc_gamestate2.gb) = None
+TEST = (try List.assoc sc3 sc_gamestate2.human.pieces with Not_found -> (-1,-1)) = (-1,-1)
+TEST = (List.mem sc3 sc_gamestate2.human.graveyard) = true
+TEST = (List.assoc cap2 sc_gamestate2.comp.pieces) = (9,10)
+TEST = (List.mem cap2 sc_gamestate2.comp.graveyard) = false
+
+(* Test that scout can't move onto a piece for its player *)
+let (boolean, sc_gamestate3) = move sc_gamestate_left sc_gamestate_left.human sc3 (2,2)
+TEST = boolean = false
+TEST = sc_gamestate3 = sc_gamestate_left
+
+(* Test that captain can move up to 1 spaces *)
+let (_, cap_gamestate) = move sc_gamestate sc_gamestate.human cap2 (2,10)
+TEST = (List.assoc (2,10) cap_gamestate.gb) = Some(cap2,cap_gamestate.human)
+TEST = (List.assoc (1,10) cap_gamestate.gb) = None
+TEST = (List.assoc cap2 cap_gamestate.human.pieces) = (2,10)
+
+(* Test that captain can move up 2 spaces *)
+let (_, cap_gamestate2) = move sc_gamestate sc_gamestate.human cap2 (3,10)
+TEST = (List.assoc (3,10) cap_gamestate2.gb) = Some(cap2,cap_gamestate2.human)
+TEST = (List.assoc (1,10) cap_gamestate2.gb) = None
+TEST = (List.assoc cap2 cap_gamestate2.human.pieces) = (3,10)
+
+let (_, cap_gamestate3) = move cap_gamestate2 cap_gamestate2.human cap2 (3,8)
+TEST = (List.assoc (3,8) cap_gamestate3.gb) = Some(cap2,cap_gamestate3.human)
+TEST = (List.assoc (3,10) cap_gamestate3.gb) = None
+TEST = (List.assoc cap2 cap_gamestate3.human.pieces) = (3,8)
+
 
 let () = Pa_ounit_lib.Runtime.summarize()
