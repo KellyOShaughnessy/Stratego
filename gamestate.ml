@@ -74,17 +74,18 @@ let get_piece (dest:location) (gb:game_board) : piece option =
 (*Check intermediate spaces if moving 2 spaces*)
 let rec check_intermediate (gb:game_board) (pl:player) (dir:string) (loc:location)
                             (dest:location) : bool =
-  if loc=dest then true
+  if loc = dest then
+    true
   else
-    let new_loc = if dir = "up" then (fst loc, snd loc + 1) else
-                  if dir = "down" then (fst loc, snd loc - 1) else
-                  if dir = "right" then (fst dest +1, snd dest)
-                  else (fst dest -1, snd dest) in
+    let new_loc = if dir = "up" then (fst loc + 1, snd loc) else
+                if dir = "down" then (fst loc - 1, snd loc) else
+                if dir = "right" then (fst loc, snd loc + 1)
+                else (fst loc, snd loc - 1) in
     let pc_tup = List.assoc new_loc gb in match pc_tup with
     |None -> check_intermediate gb pl dir new_loc dest
     |Some (x,y) ->
-      if y=pl then false
-      else check_intermediate gb pl dir new_loc dest
+     if y=pl then false
+     else check_intermediate gb pl dir new_loc dest
 
 let captain_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) : bool =
   let loc = get_location pl pc in
@@ -100,8 +101,8 @@ let captain_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) : bo
   else
     (*get direction of movement*)
     let dir =
-      if xdist=0 then (if min ydist 0 = ydist then "down" else "up")
-      else (if min xdist 0 = xdist then "left" else "right") in
+      if xdist=0 then (if min ydist 0 = ydist then "left" else "right")
+      else (if min xdist 0 = xdist then "down" else "up") in
     let dest_piece = List.assoc dest gb in
       match dest_piece with
       | None -> check_intermediate gb pl dir loc dest
@@ -111,7 +112,8 @@ let captain_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) : bo
 
 let scout_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) : bool =
   let loc = get_location pl pc in
-  (*TODO need to take absolute value*)
+(*   Printf.printf "loc: (%d,%d) dest: (%d,%d)\n" (fst loc) (snd loc) (fst dest) (snd dest);
+ *)  (*TODO need to take absolute value*)
   let xdist = fst dest - fst loc in
   let ydist = snd dest - snd loc in
   (*Check that only trying to move in one direction that is contained on board*)
@@ -120,8 +122,8 @@ let scout_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) : bool
   else
     (*get direction of movement as (dir,destination starting point)*)
     let dir =
-      if xdist=0 then (if min ydist 0 = ydist then "down" else "up")
-      else (if min xdist 0 = xdist then "left" else "right") in
+      if xdist=0 then (if min ydist 0 = ydist then "left" else "right")
+      else (if min xdist 0 = xdist then "down" else "up") in
     let dest_piece = List.assoc dest gb in
       match dest_piece with
       | None -> check_intermediate gb pl dir loc dest
@@ -157,7 +159,8 @@ let validate_move gb pl pc dest =
     (*Can move any number of empty spaces in a straight line. Not diagonally or
      *through occupied spaces.*)
     | "Scout" ->
-      if scout_validate pl pc dest gb then (true,get_piece dest gb)
+      if scout_validate pl pc dest gb then
+      (true,get_piece dest gb)
       else (false,None)
     | "Marshal" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
