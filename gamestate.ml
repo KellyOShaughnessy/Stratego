@@ -255,7 +255,8 @@ let attack piece1 piece2 p1 p2 =
   | "Bomb" -> (match piece1.pce with
              | "Miner" -> Some (piece1, p1)
              | _ -> None)
-  | "Flag" -> failwith "game is won.. new_game?"
+  | "Flag" -> failwith "game is won. show black screen showing who won the game and
+                        give option to start a new game"
   | _ -> (if get_rank piece1 < get_rank piece2 then Some (piece2, p2)
           else if get_rank piece1 > get_rank piece2 then Some (piece1,p1)
           else None)
