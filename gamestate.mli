@@ -28,8 +28,14 @@ type game_board = (location*((piece*player) option)) list
 type gamestate = {gb : game_board ; human : player;
                   comp : player; turn: player}
 
+(* creates a game_board with all locations initilized to None *)
+val empty_game : unit -> game_board
+
 (* Initializes game state from user input and computer generated setup *)
-val new_game : location option -> piece option -> gamestate -> gamestate
+val making_game : player -> player -> game_board
+
+(* Initializes game state from user input and computer generated setup *)
+val new_game : player -> player -> game_board -> gamestate
 
 (* Uses player assocation pieces record to get the location of a piece *)
 val get_location : player -> piece -> location
@@ -72,6 +78,9 @@ val print_game_board : game_board -> unit
 
 (* [piece_to_string piece] Converts the [piece] to the string representation *)
 val piece_to_string : piece -> bytes
+
+(* [piecelst_to_string piece] Converts a [piece list] to the string representation *)
+val piecelst_to_string: piece list -> bytes
 
 (* [print_gamestate gamestate]  *)
 val print_gamestate : gamestate -> unit

@@ -26,8 +26,54 @@ type game_board = (location*((piece*player) option)) list
 
 and gamestate = {gb: game_board ; human: player; comp: player; turn: player}
 
+(*
+Testing:
+let board = empty_game ();;
+print_game_board board;;
+ *)
+let empty_game () : game_board =
+  let newer = ref [] in
+  for i=1 to 10 do
+    for j=1 to 10 do
+      newer := (!newer)@[((i,j), None)];
+    done
+  done; (!newer)
+
+let making_game h c =
+  let board = empty_game () in
+  let rec newboard b pi pl = (
+      match pi with
+      | [] -> b
+      | (p,l)::t -> ( let n = List.map (fun (loc, op) -> (if (loc=l)
+        then (if op = None then (loc, Some(p,pl))
+        else failwith "You are trying to place two pieces in the same location...")
+        else (loc,op))) b in
+        newboard n t pl
+      )
+    ) in
+  let new1 = newboard board c.pieces c in
+  let new2 = newboard new1 h.pieces h in
+  new2
+
+let add_human (board: game_board) (h: player) (loc: location) (p: piece): player =
+  let pieces = h.pieces in
+  let newp = pieces@[(p,loc)] in
+  {name= h.name; pieces = newp; graveyard = h.graveyard}
+
+(* let add board h loc p c =
+   *)
+
+
 (* Initializes game state from user input and computer generated setup *)
-let new_game location piece gamestate  = failwith "unimplemented"
+(* Testing:
+let human = {name="human"; pieces = [(Spy 3, (7,3)); (Flag, (10,4))]; graveyard=[]}
+in let comp = {name="comp"; pieces = [(Spy 3, (1,6)); (Flag, (1,10))]; graveyard=[]}
+in print_gamestate (new_game human comp);;
+ *)
+let new_game (human:player) (comp:player) (board: game_board): gamestate =
+  if List.length human.pieces = List.length comp.pieces then (
+    {gb = board; human = human; comp = comp; turn = human}
+  ) else failwith "It seems that you have not placed all of your pieces"
 
 (* Uses player assocation pieces record to get the location of a piece
 get location. try with, and check if that piece is in the player's piece to chekc
@@ -376,19 +422,19 @@ let move gamestate player piece end_location =
 
 let piece_to_string (piece:piece) =
   match piece.pce with
-  | "Flag" -> "Fla "^(string_of_int piece.id)
-  | "Bomb" -> "Bom "^(string_of_int piece.id)
-  | "Spy" -> "Spy "^(string_of_int piece.id)
-  | "Scout" -> "Sco "^(string_of_int piece.id)
-  | "Marshal" -> "Mar "^(string_of_int piece.id)
-  | "General" -> "Gen "^(string_of_int piece.id)
-  | "Miner" -> "Min "^(string_of_int piece.id)
-  | "Colonel" -> "Col "^(string_of_int piece.id)
-  | "Major" -> "Maj "^(string_of_int piece.id)
-  | "Captain" -> "Cap "^(string_of_int piece.id)
-  | "Lieutenant" -> "Lie "^(string_of_int piece.id)
-  | "Sergeant" -> "Ser "^(string_of_int piece.id)
-  | "Corporal" -> "Cor "^(string_of_int piece.id)
+  | "Flag" -> " Fla "^(string_of_int piece.id)
+  | "Bomb" -> " Bom "^(string_of_int piece.id)
+  | "Spy" -> " Spy "^(string_of_int piece.id)
+  | "Scout" -> " Sco "^(string_of_int piece.id)
+  | "Marshal" -> " Mar "^(string_of_int piece.id)
+  | "General" -> " Gen "^(string_of_int piece.id)
+  | "Miner" -> " Min "^(string_of_int piece.id)
+  | "Colonel" -> " Col "^(string_of_int piece.id)
+  | "Major" -> " Maj "^(string_of_int piece.id)
+  | "Captain" -> " Cap "^(string_of_int piece.id)
+  | "Lieutenant" -> " Lie "^(string_of_int piece.id)
+  | "Sergeant" -> " Ser "^(string_of_int piece.id)
+  | "Corporal" -> " Cor "^(string_of_int piece.id)
   | _ -> failwith "not a piece"
 
 let piecelst_to_string (ls: piece list): string=
@@ -400,6 +446,7 @@ let piecelst_to_string (ls: piece list): string=
   | h::t -> (let news =  s^(piece_to_string h)^"; " in
   (addp t news)
   ) in addp ls lststr
+
 
 let rec print_game_board (game_board:game_board)=
   match game_board with
@@ -417,25 +464,31 @@ let rec print_game_board (game_board:game_board)=
     let s2 =
       (if col=1 && row!=10 then
         "     "^
-        "---------------------------------------------------------------------------------\n  "^
-        (string_of_int row)^"  | "^s1^" |"
+        "-------------------------------------------------------------\n  "^
+        (string_of_int row)^"  |"^s1^"|"
       else if col=1 && row=10 then
         "     "^
-        "---------------------------------------------------------------------------------\n "^
-        (string_of_int row)^"  | "^s1^" |"
+        "-------------------------------------------------------------\n "^
+        (string_of_int row)^"  |"^s1^"|"
       else if col=10 then
-        " "^s1^" |\n"
+        s1^"|\n"
       else
-        " "^s1^" |")
+        s1^"|")
     in
-    let s3 = (
-      if row = 1 && col = 10 then
-       s2^"     ---------------------------------------------------------------------------------"
-       ^"\n         1       2       3       4       5       6       7       8       9      10\n"
-
-     else s2
+    let s3 =
+      (if row=10 && col=10 then
+        s2^
+        "     -------------------------------------------------------------\n\n"
+      else
+        s2
+      )
+    in
+    let s4 = (
+      if row = 1 && col = 1 then
+       "\n        1     2     3     4     5     6     7     8     9    10\n"^s3
+     else s3
     ) in
-    Printf.printf "%s" s3;
+    Printf.printf "%s" s4;
     print_game_board t
 
 let print_gamestate (gamestate:gamestate) =
