@@ -17,7 +17,8 @@ and cmd =
   | Move of (piece*dir*int)
 
 (* [prompt gamestate] prompts user for next move
-* - returns a tuple of the next direction and the amount of spaces to move *)
+* - returns a tuple of the next direction and the amount of spaces to move
+* parses*)
 val prompt      : gamestate -> cmd
 
 (* [print_game gamestate] prints the gameboard *)
@@ -27,7 +28,8 @@ val print_game  : gamestate -> unit
 val print_help  : gamestate -> unit
 
 (* [process gamestate] processes the comand [cmd] and initiates the change.
-* Returns the updated gamestate *)
+* Returns the updated gamestate
+* calls the functions to change*)
 val process     : gamestate -> cmd -> gamestate
 
 (* [new_game gamestate] returns a new, fresh gamestate *)
