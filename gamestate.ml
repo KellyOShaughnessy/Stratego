@@ -358,40 +358,29 @@ let move gamestate player piece end_location =
       | Some (pce,plyr) ->
           let (removed_start_gb, new_player) = remove_from_board game_board
                                                 player piece start_location in
-          if new_player.name="human" then
-            if plyr.name="human" then
-              let (add_end_gb, newer_player) = add_to_board removed_start_gb
-                                                  new_player pce
-                                                  end_location in
-              let new_opp_graveyard = opp_piece::gamestate.comp.graveyard in
-              let new_opp_pieces = remove_from_pieces opp_piece gamestate.comp.pieces in
-              let new_opp = {gamestate.comp with pieces=new_opp_pieces; graveyard = new_opp_graveyard} in
+          (* Attacking player 'wins' the attack *)
+          if new_player.name = plyr.name then
+            let (add_end_gb, newer_player) = add_to_board removed_start_gb
+                                                new_player pce
+                                                end_location in
+            let new_opp_graveyard = opp_piece::gamestate.comp.graveyard in
+            let new_opp_pieces = remove_from_pieces opp_piece gamestate.comp.pieces in
+            let new_opp = {gamestate.comp with pieces=new_opp_pieces; graveyard = new_opp_graveyard} in
+            if new_player.name = "human" then
               (true,{gamestate with human = newer_player; comp = new_opp; gb=add_end_gb})
             else
+              (true,{gamestate with comp = newer_player; human = new_opp; gb=add_end_gb})
+          else
               let (add_end_gb, opp_player) = add_to_board removed_start_gb
                                                   gamestate.comp pce
                                                   end_location in
               let new_pl_graveyard = piece::new_player.graveyard in
               let new_pl_pieces = remove_from_pieces piece new_player.pieces in
               let new_pl = {new_player with pieces=new_pl_pieces; graveyard = new_pl_graveyard} in
-              (true,{gamestate with human = new_pl; comp=opp_player; gb=add_end_gb})
-          else
-            if plyr.name="comp" then
-              let (add_end_gb, newer_player) = add_to_board removed_start_gb
-                                                  new_player pce
-                                                  end_location in
-              let new_opp_graveyard = opp_piece::gamestate.human.graveyard in
-              let new_opp_pieces = remove_from_pieces opp_piece gamestate.human.pieces in
-              let new_opp = {gamestate.human with pieces=new_opp_pieces; graveyard = new_opp_graveyard} in
-              (true,{gamestate with comp = newer_player; human = new_opp; gb=add_end_gb})
-            else
-              let (add_end_gb, opp_player) = add_to_board removed_start_gb
-                                                  gamestate.comp pce
-                                                  end_location in
-              let new_comp_graveyard = piece::new_player.graveyard in
-              let new_comp_pieces = remove_from_pieces piece new_player.pieces in
-              let new_comp = {new_player with pieces=new_comp_pieces; graveyard = new_comp_graveyard} in
-              (true,{gamestate with comp = new_comp; human=opp_player; gb=add_end_gb})
+              if new_player.name = "human" then
+                (true,{gamestate with human = new_pl; comp=opp_player; gb=add_end_gb})
+              else
+                (true,{gamestate with comp = new_pl; human=opp_player; gb=add_end_gb})
       )
   | (true, None) ->
       let (removed_gb,new_player) = remove_from_board game_board player
