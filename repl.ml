@@ -2,13 +2,13 @@ open Gamestate
 
 
 (* Defining possible movement direction *)
-type dir = Up | Down | Left | Right
+(* type dir = Up | Down | Left | Right *)
 (* Defining possible commands *)
 and cmd =
   | Quit
   | NewGame
   | Help of bytes
-  | Move of (piece*dir*int)
+  | Move of (piece*location)
 
 let prompt gamestate = failwith "unimplemented"
 

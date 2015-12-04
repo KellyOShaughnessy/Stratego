@@ -58,7 +58,7 @@ let making_game h c =
 let add_human (board: game_board) (h: player) (loc: location) (p: piece): player =
   let pieces = h.pieces in
   let newp = pieces@[(p,loc)] in
-  {name= h.name; pieces = newp; graveyard = h.graveyard}
+  {name= h.name; pieces = newp; graveyard = h.graveyard; won=false}
 
 (* let add board h loc p c =
    *)
@@ -255,7 +255,7 @@ let attack piece1 piece2 p1 p2 =
   | "Bomb" -> (match piece1.pce with
              | "Miner" -> Some (piece1, p1)
              | _ -> None)
-  | "Flag" -> failwith "game is won.. new_game?"
+  | "Flag" -> Some(piece1,{p1 with won=true})
   | _ -> (if get_rank piece1 < get_rank piece2 then Some (piece2, p2)
           else if get_rank piece1 > get_rank piece2 then Some (piece1,p1)
           else None)
