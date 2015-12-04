@@ -65,8 +65,8 @@ let computer_list =
   (ser2,(10,9));
   (sc3,(10,10))]
 
-let hum = {name= "human"; pieces = human_list; graveyard=[]}
-let computer = {name= "comp"; pieces = computer_list; graveyard=[]}
+let hum = {name= "human"; pieces = human_list; graveyard=[]; won=false}
+let computer = {name= "comp"; pieces = computer_list; graveyard=[]; won=false}
 
 let game_board =
 [
@@ -415,7 +415,6 @@ TEST = (List.assoc (2,10) cap_gamestate.gb) = Some(cap2,cap_gamestate.human)
 TEST = (List.assoc (1,10) cap_gamestate.gb) = None
 TEST = (List.assoc cap2 cap_gamestate.human.pieces) = (2,10)
 
-(* Test that captain can move up 2 spaces *)
 let (_, cap_gamestate2) = move sc_gamestate sc_gamestate.human cap2 (3,10)
 TEST = (List.assoc (3,10) cap_gamestate2.gb) = Some(cap2,cap_gamestate2.human)
 TEST = (List.assoc (1,10) cap_gamestate2.gb) = None

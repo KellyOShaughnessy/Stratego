@@ -10,7 +10,7 @@ let get_rank (piece:piece) : int =
   match piece.pce with
   | "Spy" -> 1
   | "Scout" -> 2
-  | "Marshal" -> 10
+  | "Marshal" -> 11
   | "General" -> 10
   | "Miner" -> 3
   | "Colonel" -> 9
@@ -334,19 +334,6 @@ let add_to_board game_board player piece location =
   in
   (new_gameboard, new_player_1)
 
-(* returns a new gamestate with updated piece locations
-* - [gamestate] is the current gamestate to be updated
-* - [player] is the current player
-* - [piece] is the piece to try to move
-* - [location] is the desired end location
-* Calls get_location to get the current location of the pice
-* Calls validate_move to verify that that piece can move to the end location
-* If validate_move returns true with no piece,
-*   update game state with the current piece
-* If validate_move returns true with some piece,
-*   calls attack function and updates board
-* If validate_move returns false,
-*   asks player to try a different move *)
 let move gamestate player piece end_location =
   let start_location = get_location player piece in
   let game_board = gamestate.gb in
