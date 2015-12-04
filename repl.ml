@@ -4,7 +4,7 @@ open Gamestate
 (* Defining possible movement direction *)
 (* type dir = Up | Down | Left | Right *)
 (* Defining possible commands *)
-and cmd =
+type cmd =
   | Quit
   | NewGame
   | Help of bytes
