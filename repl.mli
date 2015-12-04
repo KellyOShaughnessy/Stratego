@@ -29,10 +29,10 @@ val print_help  : bytes -> gamestate -> unit
 
 (* [process gamestate] processes the comand [cmd] and initiates the change.
 * Returns the updated gamestate. calls all of the gamestate functions. *)
-val process     : gamestate -> cmd -> gamestate
+val process     : gamestate -> cmd -> bool*gamestate
 
 (* [new_game gamestate] returns a new, fresh gamestate/gameboard*)
-val new_game    : unit -> gamestate
+val new_game    : unit -> bool*gamestate
 
 (* [quit gamestate] returns the final gamestate and quits the game *)
 val quit        : gamestate -> unit

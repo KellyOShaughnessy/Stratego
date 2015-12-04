@@ -12,8 +12,13 @@ type cmd =
 
 let prompt gamestate = failwith "unimplemented"
 
-let print_game gamestate = failwith "unimplemented"
 
+let new_game () = failwith "unimplemented"
+
+let quit gamestate = failwith "unimplemented"
+
+let print_game gamestate =
+  print_gamestate gamestate
 
 let print_piece_list player =
   Printf.printf "     Your list of pieces \n";
@@ -96,16 +101,10 @@ let print_help input gamestate =
         \n"
     | _ -> Printf.printf "Not a valid help command, please try again. \n"
 
-
-
-
-let new_game () = failwith "unimplemented"
-
-let quit gamestate = failwith "unimplemented"
-
 let process gamestate cmd =
   match cmd with
-  | Quit -> quit gamestate
-  | NewGame -> new_game ()
-  | Help s -> print_help s gamestate; gamestate
-  | Move (pce,loc) -> failwith "unimplemented"
+  | Quit -> (false, quit gamestate)
+  | NewGame -> (true, new_game ())
+  | Help s -> print_help s gamestate; (false, gamestate)
+  | Move (pce,loc) ->
+      move gamestate gamestate.turn pce loc
