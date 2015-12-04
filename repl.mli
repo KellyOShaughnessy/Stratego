@@ -29,7 +29,7 @@ val print_game  : gamestate -> unit
 val print_help  : gamestate -> unit
 
 (* [process gamestate] processes the comand [cmd] and initiates the change.
-* Returns the updated gamestate. *)
+* Returns the updated gamestate. calls all of the gamestate functions. *)
 val process     : gamestate -> cmd -> gamestate
 
 (* [new_game gamestate] returns a new, fresh gamestate/gameboard*)
