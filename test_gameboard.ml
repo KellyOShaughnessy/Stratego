@@ -65,8 +65,8 @@ let computer_list =
   (ser2,(10,9));
   (sc3,(10,10))]
 
-let hum = {name= "human"; pieces = human_list; graveyard=[]}
-let computer = {name= "comp"; pieces = computer_list; graveyard=[]}
+let hum = {name= "human"; pieces = human_list; graveyard=[] ; won = false}
+let computer = {name= "comp"; pieces = computer_list; graveyard=[]; won=false}
 
 let game_board =
 [
