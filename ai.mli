@@ -1,12 +1,16 @@
 open Gamestate
+open Random
+open Int64
 
 (* [setup game_board] takes the the pieces for the computer player
 during initialization *)
 val setup         : unit -> player
 
-(* [next_move gamestate] takes a gamestate and returns a command
-for the next move *)
-val next_move     : gamestate -> location
+(* [choose_destination gamestate piece] takes a gamestate and a piece
+* and returns an end location for that piece *)
+val choose_destination     : gamestate -> piece -> location -> location list -> location option
 
-(* Computer chooses its next move *)
-val computer_move : game_board -> player -> (piece*location)
+val choose_piece : player -> (piece*location) list -> (piece*location) option
+
+(* [next_move gmae_board] *)
+val next_move : gamestate -> location list -> ((piece*location) option) -> piece list -> ((piece*location) option)

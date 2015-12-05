@@ -370,6 +370,8 @@ TEST "Scout" = (validate_move game_board hum sc3 (7,10)) = (true,None)
 TEST "Scout" = (validate_move game_board hum sc3 (8,10)) = (true,None)
 TEST "Scout" = (validate_move game_board hum sc3 (9,10)) = (true,Some(cap2))
 
+TEST "Scout" = (validate_move game_board computer sc1 (9,1)) = (false,None)
+
 (* Tests that Captain can move up to two squares in the same direction *)
 (*TODO: cannot test successus until captain has moved*)
 TEST "Captain" = (validate_move game_board hum cap1 (1,5)) = (false,None)

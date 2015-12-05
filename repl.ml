@@ -55,7 +55,7 @@ let extract_piece (pc:string) : piece =
     ("sc2",{pce="Scout";id=2});
     ("l2",{pce="Lieutenant";id=2});
     ("ser2",{pce="Sergeant";id=2});
-    ("sc3",{pce="Scout";id=3}) ] in
+    ("cor1",{pce="Corporal";id=1) ] in
   let ret_pce = (List.assoc pc pce_lst) in
   ret_pce
 
@@ -168,10 +168,10 @@ let new_game () =
   let sc2 = {pce="Scout";id=2} in
   let l2 = {pce="Lieutenant";id=2} in
   let ser2 = {pce="Sergeant";id=2} in
-  let sc3 = {pce="Scout";id=3} in
+  let cor1 = {pce="Corporal";id=1} in
   let piece_list =
     [sp1; sc1; cap1; maj1; f1; ser1; co1; mi1; g1; cap2; mi2; ma1; l1; b1; b2;
-    b3; sc2; l2; ser2; sc3]
+    b3; sc2; l2; ser2; cor1]
   in
   let rec build_human hum c pieces = (
     let new_board = making_game hum c in
