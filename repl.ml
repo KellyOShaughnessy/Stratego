@@ -55,7 +55,7 @@ let extract_piece (pc:string) : piece =
     ("sc2",{pce="Scout";id=2});
     ("l2",{pce="Lieutenant";id=2});
     ("ser2",{pce="Sergeant";id=2});
-    ("cor1",{pce="Corporal";id=1) ] in
+    ("cor1",{pce="Corporal";id=1}) ] in
   let ret_pce = (List.assoc pc pce_lst) in
   ret_pce
 
