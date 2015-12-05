@@ -56,6 +56,8 @@ let rec parse stringed =
     | _ -> print_string "\n\nWhat was that again? " ; parse (read_line ())
   in cmd
 
+
+(* TODO: Need testing!! *)
 let new_game () =
   let comp = setup () in
   let sp1 = {pce="Spy";id=1} in
