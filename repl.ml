@@ -1,5 +1,6 @@
 open Gamestate
 open Ai
+open Pervasives
 (* NOTE: WHEN COMPILING, USE 'cs3110 compile -p str repl.ml' *)
 
 (*TODO: add function to print opponent's graveyard list*)
@@ -23,10 +24,9 @@ let fix_input (inp:string) : string list =
   (*lowercase & get rid of extraneous characters*)
   let input_lower = String.lowercase inp in
   let input_trim = String.trim input_lower in
-  let input_better = Str.global_replace (Str.regexp "[^0-9a-zA-Z ]+") "" input_trim in
   (*splits into list*)
   let regex = Str.regexp " +" in
-  let ret_list = Str.split regex input_better in
+  let ret_list = Str.split regex input_trim in
   ret_list
 
 let print_retry () =
@@ -88,11 +88,11 @@ let extract_location (inp:string list) : int*int =
       | _    -> (
         if (paren1 && paren2) then
           let before_com =
-            (try int_of_string (String.sub loc_str 1 comma)
-            with | Not_found -> -1 ) in
+           (try int_of_string (String.sub loc_str 1 (comma-1))
+            with | Failure x -> -1 | Not_found -> -1) in
           let after_com  =
            (try int_of_string (String.sub loc_str comma (last - comma +1))
-            with | Not_found -> -1 ) in
+            with | Failure x -> -1 | Not_found -> -1) in
           (before_com,after_com)
         else
           (-1,-1)
@@ -198,7 +198,7 @@ let new_game () =
         )
       )
       | _ -> print_string "\n\nThis is not valid syntax for placing your pieces.
-                            \nPlease try placing a piece.";
+                            \nPlease try placing a piece.\n";
         build_human hum c pieces
     )
   ) in
@@ -309,9 +309,9 @@ let print_instructions () =
         \n"
 
 let print_intro () : unit =
-  print_string "Type 'help' to revisit the list of commands, type 'new' to\n
-                get started, 'instructions' to understand how to play, or 'quit'\n
-                if you just aren't up for the challenge right now.\n\n"
+  print_string "  Type 'help' to revisit the list of commands, type 'new' to
+  get started, 'instructions' to understand how to play, or 'quit'
+  if you just aren't up for the challenge right now.\n"
 
 (*TODO: Print function for when a player wins. Add in restart capabilities*)
 (* let check_for_win gamestate : bool =
@@ -356,7 +356,7 @@ let rec process gamestate =
     )
   | Place (p,l) -> (
       match gamestate with
-      | None -> failwith "unimplemented"
+      | None -> print_string "Initialization failed. Please quit and try again."
       | Some g -> (
         print_string "You have already placed all of your pieces!\n";
         process gamestate )
