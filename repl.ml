@@ -347,7 +347,7 @@ let rec process gamestate =
   | Move (pce,loc) -> (
       match gamestate with
       | None -> (
-           print_string "You must start the game before you can print your pieces!\n";
+          print_string "You must start the game before you can print your pieces!\n";
           print_intro ();
           process None)
       | Some g -> (

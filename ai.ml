@@ -24,7 +24,7 @@ let setup () =
   let l2 = {pce="Lieutenant";id=2} in
   let ser2 = {pce="Sergeant";id=2} in
   let cor1 = {pce="Corporal";id=1} in
-  let piece_list =
+  let piece_list_1 =
     [(sp1,(9,1));
     (sc1,(9,2));
     (cap1,(9,3));
@@ -46,7 +46,85 @@ let setup () =
     (ser2,(10,9));
     (cor1,(10,10))]
   in
-  newplayer "comp" piece_list
+  let piece_list_2 =
+    [(cap1,(9,1));
+    (b1, (9,2));
+    (g1, (9,3));
+    (b2, (9,4));
+    (sp1,(9,5));
+    (ser1,(9,6));
+    (sc1,(9,7));
+    (ma1,(9,8));
+    (maj1,(9,9));
+    (ser2,(9,10));
+    (cap2,(10,1));
+    (f1,(10,2));
+    (l1,(10,3));
+    (mi2,(10,4));
+    (mi1,(10,5));
+    (co1,(10,6));
+    (sc2,(10,7));
+    (b3,(10,8));
+    (cor1,(10,9));
+    (l2,(10,10))]
+  in
+  let piece_list_3 =
+    [(g1, (9,1));
+    (b3,(9,2));
+    (sc1,(9,3));
+    (maj1,(9,4));
+    (sc2,(9,5));
+    (ser2,(9,6));
+    (cor1,(9,7));
+    (b1, (9,8));
+    (b2, (9,9));
+    (ma1,(9,10));
+    (cap2,(10,1));
+    (f1,(10,2));
+    (sp1,(10,3));
+    (mi2,(10,4));
+    (co1,(10,5));
+    (l2,(10,6));
+    (ser1,(10,7));
+    (cap1,(10,8));
+    (mi1,(10,9));
+    (l1,(10,10));]
+  in
+  let piece_list_4 =
+    [(cap1,(9,1));
+    (b1, (9,2));
+    (sp1,(9,3));
+    (g1, (9,4));
+    (b2, (9,5));
+    (sc1,(9,6));
+    (l1,(10,7));
+    (maj1,(9,8));
+    (ser2,(9,9));
+    (cor1,(9,10));
+    (ma1,(10,1));
+    (cap2,(10,2));
+    (f1,(10,3));
+    (mi1,(10,4));
+    (ser1,(9,5));
+    (sc2,(10,6));
+    (co1,(10,7));
+    (b3,(10,8));
+    (mi2,(10,9));
+    (l2,(10,10))]
+  in
+  let rand = to_int(Random.int64 (of_int 4)) in
+  let start_list =
+    (if rand = 0 then
+      piece_list_1
+    else if rand = 1 then
+      piece_list_2
+    else if rand = 2 then
+      piece_list_3
+    else
+      piece_list_4
+    )
+  in
+  newplayer "comp" start_list
 
 (* 1 spy
 2 scouts
@@ -62,27 +140,44 @@ let setup () =
 2 lieutenants
 1 gen  *)
 
+let opp_piece_exists gamestate cur_location end_dest =
+  match List.assoc cur_location gamestate.gb with
+  | None -> false
+  | Some (piece,player) -> player.name = "human"
+
 let rec choose_destination gamestate piece cur_location tried_locations =
   if List.length tried_locations < 4 then
     let up = (fst cur_location - 1, snd cur_location) in
+    let down = (fst cur_location + 1, snd cur_location) in
+    let right = (fst cur_location, snd cur_location - 1) in
+    let left = (fst cur_location, snd cur_location + 1) in
+
     let end_dest =
-      (if List.mem up tried_locations then
-        let direction64 = Random.int64 (of_int 5) in
-        let direction = to_int direction64 in
-        (if direction <= 1 then
-          (* Left *)
-          (fst cur_location, snd cur_location + 1)
-        else if direction <= 3 then
-          (* Right *)
-          (fst cur_location, snd cur_location - 1)
-        else
-          (* Down *)
-          (fst cur_location + 1, snd cur_location)
-        )
-      else
+      (if opp_piece_exists gamestate cur_location up then
         up
+      else if opp_piece_exists gamestate cur_location right then
+        right
+      else if opp_piece_exists gamestate cur_location left then
+        left
+      else if opp_piece_exists gamestate cur_location down then
+        down
+      else
+        (if List.mem up tried_locations then
+          let direction64 = Random.int64 (of_int 5) in
+          let direction = to_int direction64 in
+          (if direction <= 1 then
+            left
+          else if direction <= 3 then
+            right
+          else
+            down
+          )
+        else
+          up
+        )
       )
       in
+    Printf.printf "%d %d \n" (fst end_dest) (snd end_dest);
     (if List.mem end_dest tried_locations then
       choose_destination gamestate piece cur_location tried_locations
     else

@@ -518,4 +518,15 @@ let print_gamestate (gamestate:gamestate) =
   let t =
     if turnt = "human" then "Yours" else "Opponent"
   in
-  Printf.printf "     Turn: %s\n\n" t;
+  Printf.printf "     Turn: %s\n\n" t
+
+let debug_print_gameboard gamestate =
+  let new_gb =
+    (List.map
+      (fun (loc, opt) ->
+        (match opt with
+        | None -> (loc, None)
+        | Some (piece,player) -> (loc, Some(piece,gamestate.human)))
+    )
+    gamestate.gb) in
+  print_game_board new_gb
