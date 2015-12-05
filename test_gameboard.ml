@@ -307,6 +307,8 @@ TEST "newcomplayer" = (newplayer "comp" computer_list) = computer
 TEST "building game_board" = (making_game hum computer) = game_board
 
 
+TEST "add_human" = () =
+
 (* Tests that Bomb and Flag cannot move *)
 TEST = (validate_move game_board hum b1 (2,5)) = (false,None)
 TEST = (validate_move game_board hum b2 (2,7)) = (false,None)

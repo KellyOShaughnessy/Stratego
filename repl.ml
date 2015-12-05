@@ -12,11 +12,19 @@ type cmd =
 
 let prompt gamestate = failwith "unimplemented"
 
-
 let new_game () = failwith "unimplemented"
 
 let quit gamestate = failwith "unimplemented"
-
+(*   let rec quitted (game: gamestate):unit = (
+    let prompt2 = print_string "\nAre you sure you would like to quit this game?\n\n-> " in
+    let response2 =  String.lowercase(read_line prompt2) in
+    if response2 = "no"
+      then (print_string "\nOK.\n\n"; prompt game)
+      else if response2 = "yes" then Printf.printf "\nOK.\n\n";
+      else (print_string "\nPlease answer the question."; quitted game)
+    )
+  in quitted gamestate
+ *)
 let print_game gamestate =
   print_gamestate gamestate
 

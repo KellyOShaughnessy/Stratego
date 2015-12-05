@@ -10,8 +10,7 @@ and player = {name: bytes; pieces : (piece*location) list;
   Some(piece, player) if the position currently holds a piece *)
 and game_board = (location*((piece*player) option)) list
 
-and gamestate = {gb : game_board ; human : player;
-                  comp : player; turn: player}
+and gamestate = {gb : game_board ; human : player; comp : player; turn: player}
 
 (*get the rank of the piece during attack *)
 val get_rank : piece -> int
@@ -45,9 +44,11 @@ val validate_move : game_board -> player -> piece -> location ->
 * remain on the game board *)
 val attack : piece -> piece -> player -> player -> ((piece*player) option)
 
-val remove_from_board : game_board -> player -> piece -> location -> game_board*player
+val remove_from_board : game_board -> player -> piece -> location ->
+  game_board*player
 
-val add_to_board : game_board -> player -> piece -> location -> game_board*player
+val add_to_board : game_board -> player -> piece -> location ->
+  game_board*player
 
 (* returns a new gamestate with updated piece locations
 * - [gamestate] is the current gamestate to be updated
@@ -70,7 +71,8 @@ val print_game_board : game_board -> unit
 (* [piece_to_string piece] Converts the [piece] to the string representation *)
 val piece_to_string : piece -> bytes
 
-(* [piecelst_to_string piece] Converts a [piece list] to the string representation *)
+(* [piecelst_to_string piece] Converts a [piece list] to the string
+   representation *)
 val piecelst_to_string: piece list -> bytes
 
 (* [print_gamestate gamestate]  *)
