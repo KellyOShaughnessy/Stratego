@@ -216,16 +216,16 @@ let new_game () =
 (*TODO: implement*)
 let quit gamestate =
   print_string "Now quitting the game :'( -- Play again soon!!\n\n"
-(*   let rec quitted (game: gamestate):unit = (
+   let rec quitted (game: gamestate):unit = (
     let prompt2 = print_string "\nAre you sure you would like to quit this game?\n\n-> " in
     let response2 =  String.lowercase(read_line prompt2) in
     if response2 = "no"
-      then (print_string "\nOK.\n\n"; prompt game)
+      then (print_string "\nOK.\n\n"; process game)
       else if response2 = "yes" then Printf.printf "\nOK.\n\n";
       else (print_string "\nPlease answer the question."; quitted game)
     )
   in quitted gamestate
- *)
+
 
 (******************************PRINT FUNCTIONS*********************************)
 
