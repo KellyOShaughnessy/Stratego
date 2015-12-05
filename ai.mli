@@ -29,4 +29,40 @@ too see which direction it should move in.
 8. If any pieces (of the computers) does get attacked then start moving a random piece of a
 higer rank.
 9.
+
+(*
+
+  1. Scouts moving more than two spaces
+  2. Piece moving only either 1 or 2 spaces- Captain
+  3. If a large block of unmoving pieces later in the game
+  then flag surrounded by bombs.
+  4. Print opponents graveyard list
+
+  5. When a new game is started, the gamstate prompts the AI to load
+     its opening board configuration.
+  6. Implement ~6 starting board configurations, and randokmly select from that.
+
+  7. HARD AI, place bomb at (10,10) and bombs are (10,9) and (9,10). flag is blocked
+  by two corner bombs.
+
+
+
+  only tuple of rank should be used. dont really
+  care about the name of the piece. all we need to know
+  of opponents are ranks, flag, and bomb.
+
+
+
+
+*)
+
+
+
+
+
+
+
+
+
+
 *)
