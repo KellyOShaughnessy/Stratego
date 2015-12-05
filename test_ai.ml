@@ -187,6 +187,11 @@ let gamestate = {gb=game_board; human=hum; comp=computer; turn=hum}
 
 TEST = debug_print_gameboard gamestate = ()
 
+let get_opt opt =
+  match opt with
+  | None -> failwith "nah"
+  | Some g -> g
+
 (* ============================================================================== *)
 (* TESTING THE COMPLETE RANDOM SELECTION *)
 (* ============================================================================== *)
@@ -196,7 +201,7 @@ let (move_pce1, move_loc1) = (match next_move1 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce1.pce (fst move_loc1) (snd move_loc1) = ()
-let (_,new_gs) = move gamestate gamestate.comp move_pce1 move_loc1
+let new_gs = get_opt(move gamestate gamestate.comp move_pce1 move_loc1)
 TEST = debug_print_gameboard new_gs = ()
 
 let next_move2 = next_move new_gs [] None []
@@ -204,7 +209,7 @@ let (move_pce2, move_loc2) = (match next_move2 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce2.pce (fst move_loc2) (snd move_loc2) = ()
-let (_,new_gs2) = move new_gs new_gs.comp move_pce2 move_loc2
+let new_gs2 = get_opt(move new_gs new_gs.comp move_pce2 move_loc2)
 TEST = debug_print_gameboard new_gs2 = ()
 
 let next_move3 = next_move new_gs2 [] None []
@@ -212,7 +217,7 @@ let (move_pce3, move_loc3) = (match next_move3 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce3.pce (fst move_loc3) (snd move_loc3) = ()
-let (_,new_gs3) = move new_gs2 new_gs2.comp move_pce3 move_loc3
+let new_gs3 = get_opt(move new_gs2 new_gs2.comp move_pce3 move_loc3)
 TEST = debug_print_gameboard new_gs3 = ()
 
 
@@ -221,7 +226,7 @@ let (move_pce4, move_loc4) = (match next_move4 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce4.pce (fst move_loc4) (snd move_loc4) = ()
-let (_,new_gs4) = move new_gs3 new_gs3.comp move_pce4 move_loc4
+let new_gs4 = get_opt(move new_gs3 new_gs3.comp move_pce4 move_loc4)
 TEST = debug_print_gameboard new_gs4 = ()
 
 let next_move5 = next_move new_gs4 [] None []
@@ -229,7 +234,7 @@ let (move_pce5, move_loc5) = (match next_move5 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce5.pce (fst move_loc5) (snd move_loc5) = ()
-let (_,new_gs5) = move new_gs4 new_gs4.comp move_pce5 move_loc5
+let new_gs5 = get_opt(move new_gs4 new_gs4.comp move_pce5 move_loc5)
 TEST = debug_print_gameboard new_gs5 = ()
 
 let next_move6 = next_move new_gs5 [] None []
@@ -237,7 +242,7 @@ let (move_pce6, move_loc6) = (match next_move6 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce6.pce (fst move_loc6) (snd move_loc6) = ()
-let (_,new_gs6) = move new_gs5 new_gs5.comp move_pce6 move_loc6
+let new_gs6 = get_opt(move new_gs5 new_gs5.comp move_pce6 move_loc6)
 TEST = debug_print_gameboard new_gs6 = ()
 
 let next_move7 = next_move new_gs6 [] None []
@@ -245,7 +250,7 @@ let (move_pce7, move_loc7) = (match next_move7 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce7.pce (fst move_loc7) (snd move_loc7) = ()
-let (_,new_gs7) = move new_gs6 new_gs6.comp move_pce7 move_loc7
+let new_gs7 = get_opt(move new_gs6 new_gs6.comp move_pce7 move_loc7)
 TEST = debug_print_gameboard new_gs7 = ()
 
 let next_move8 = next_move new_gs7 [] None []
@@ -253,7 +258,7 @@ let (move_pce8, move_loc8) = (match next_move8 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce8.pce (fst move_loc8) (snd move_loc8) = ()
-let (_,new_gs8) = move new_gs7 new_gs7.comp move_pce8 move_loc8
+let new_gs8 = get_opt(move new_gs7 new_gs7.comp move_pce8 move_loc8)
 TEST = debug_print_gameboard new_gs8 = ()
 
 let next_move9 = next_move new_gs8 [] None []
@@ -261,7 +266,7 @@ let (move_pce9, move_loc9) = (match next_move9 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce9.pce (fst move_loc9) (snd move_loc9) = ()
-let (_,new_gs9) = move new_gs8 new_gs8.comp move_pce9 move_loc9
+let new_gs9 = get_opt(move new_gs8 new_gs8.comp move_pce9 move_loc9)
 TEST = debug_print_gameboard new_gs9 = ()
 
 let next_move10 = next_move new_gs9 [] None []
@@ -269,7 +274,7 @@ let (move_pce10, move_loc10) = (match next_move10 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce10.pce (fst move_loc10) (snd move_loc10) = ()
-let (_,new_gs10) = move new_gs9 new_gs9.comp move_pce10 move_loc10
+let new_gs10 = get_opt(move new_gs9 new_gs9.comp move_pce10 move_loc10)
 TEST = debug_print_gameboard new_gs10 = () *)
 
 
@@ -277,20 +282,22 @@ TEST = debug_print_gameboard new_gs10 = () *)
 (* TESTING WHEN WE KNOW A PIECE HAS RECENTLY MOVED *)
 (* ============================================================================== *)
 
-let next_move1 = next_move gamestate [] (Some (ser1, (9,6))) []
+
+(* let next_move1 = next_move gamestate [] (Some (ser1, (9,6))) []
 let (move_pce1, move_loc1) = (match next_move1 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce1.pce (fst move_loc1) (snd move_loc1) = ()
-let (_,new_gs) = move gamestate gamestate.comp move_pce1 move_loc1
+let new_gs = get_opt(move gamestate gamestate.comp move_pce1 move_loc1)
 TEST = debug_print_gameboard new_gs = ()
+
 
 let next_move2 = next_move new_gs [] (Some (move_pce1, move_loc1)) []
 let (move_pce2, move_loc2) = (match next_move2 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce2.pce (fst move_loc2) (snd move_loc2) = ()
-let (_,new_gs2) = move new_gs new_gs.comp move_pce2 move_loc2
+let new_gs2 = get_opt(move new_gs new_gs.comp move_pce2 move_loc2)
 TEST = debug_print_gameboard new_gs2 = ()
 
 let next_move3 = next_move new_gs2 [] (Some (move_pce2, move_loc2)) []
@@ -298,7 +305,7 @@ let (move_pce3, move_loc3) = (match next_move3 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce3.pce (fst move_loc3) (snd move_loc3) = ()
-let (_,new_gs3) = move new_gs2 new_gs2.comp move_pce3 move_loc3
+let new_gs3 = get_opt(move new_gs2 new_gs2.comp move_pce3 move_loc3)
 TEST = debug_print_gameboard new_gs3 = ()
 
 let next_move4 = next_move new_gs3 [] (Some (move_pce3, move_loc3)) []
@@ -306,7 +313,7 @@ let (move_pce4, move_loc4) = (match next_move4 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce4.pce (fst move_loc4) (snd move_loc4) = ()
-let (_,new_gs4) = move new_gs3 new_gs3.comp move_pce4 move_loc4
+let new_gs4 = get_opt(move new_gs3 new_gs3.comp move_pce4 move_loc4)
 TEST = debug_print_gameboard new_gs4 = ()
 
 let next_move5 = next_move new_gs4 [] (Some (move_pce4, move_loc4)) []
@@ -314,7 +321,7 @@ let (move_pce5, move_loc5) = (match next_move5 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce5.pce (fst move_loc5) (snd move_loc5) = ()
-let (_,new_gs5) = move new_gs4 new_gs4.comp move_pce5 move_loc5
+let new_gs5 = get_opt(move new_gs4 new_gs4.comp move_pce5 move_loc5)
 TEST = debug_print_gameboard new_gs5 = ()
 
 let next_move6 = next_move new_gs5 [] (Some (move_pce5, move_loc5)) []
@@ -322,7 +329,7 @@ let (move_pce6, move_loc6) = (match next_move6 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce6.pce (fst move_loc6) (snd move_loc6) = ()
-let (_,new_gs6) = move new_gs5 new_gs5.comp move_pce6 move_loc6
+let new_gs6 = get_opt(move new_gs5 new_gs5.comp move_pce6 move_loc6)
 TEST = debug_print_gameboard new_gs6 = ()
 
 let next_move7 = next_move new_gs6 [] (Some (move_pce6, move_loc6)) []
@@ -330,7 +337,7 @@ let (move_pce7, move_loc7) = (match next_move7 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce7.pce (fst move_loc7) (snd move_loc7) = ()
-let (_,new_gs7) = move new_gs6 new_gs6.comp move_pce7 move_loc7
+let new_gs7 = get_opt(move new_gs6 new_gs6.comp move_pce7 move_loc7)
 TEST = debug_print_gameboard new_gs7 = ()
 
 let next_move8 = next_move new_gs7 [] (None) []
@@ -338,6 +345,6 @@ let (move_pce8, move_loc8) = (match next_move8 with
   | None -> failwith "shouldnt happen"
   | Some (p,l) -> (p,l))
 TEST = Printf.printf "piece: %s, location %d %d \n" move_pce8.pce (fst move_loc8) (snd move_loc8) = ()
-let (_,new_gs8) = move new_gs7 new_gs7.comp move_pce8 move_loc8
+let new_gs8 = get_opt(move new_gs7 new_gs7.comp move_pce8 move_loc8)
 TEST = debug_print_gameboard new_gs8 = ()
-
+ *)
