@@ -83,3 +83,4 @@ val piecelst_to_string: piece list -> bytes
 (* [print_gamestate gamestate]  *)
 val print_gamestate : gamestate -> unit
 
+val debug_print_gameboard : gamestate -> unit

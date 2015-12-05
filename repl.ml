@@ -1,5 +1,6 @@
 open Gamestate
 open Ai
+open Pervasives
 (* NOTE: WHEN COMPILING, USE 'cs3110 compile -p str repl.ml' *)
 
 (*TODO: add function to print opponent's graveyard list*)
@@ -23,10 +24,9 @@ let fix_input (inp:string) : string list =
   (*lowercase & get rid of extraneous characters*)
   let input_lower = String.lowercase inp in
   let input_trim = String.trim input_lower in
-  let input_better = Str.global_replace (Str.regexp "[^0-9a-zA-Z ]+") "" input_trim in
   (*splits into list*)
   let regex = Str.regexp " +" in
-  let ret_list = Str.split regex input_better in
+  let ret_list = Str.split regex input_trim in
   ret_list
 
 let print_retry () =
@@ -36,33 +36,33 @@ let print_retry () =
 
 let extract_piece (pc:string) : piece =
   let pce_lst = [
-    ("sp1",{pce="Spy";id=1});
-    ("sc1", {pce="Scout";id=1});
+    ("spy1",{pce="Spy";id=1});
+    ("sco1", {pce="Scout";id=1});
     ("cap1",{pce="Captain";id=1});
     ("maj1",{pce="Major";id=1});
-    ("f1",{pce="Flag";id=1});
+    ("fla1",{pce="Flag";id=1});
     ("ser1",{pce="Sergeant";id=1});
-    ("co1",{pce="Colonel";id=1});
-    ("mi1",{pce="Miner";id=1});
-    ("g1",{pce="General";id=1});
+    ("col1",{pce="Colonel";id=1});
+    ("min1",{pce="Miner";id=1});
+    ("gen1",{pce="General";id=1});
     ("cap2",{pce="Captain";id=2});
-    ("mi2",{pce="Miner";id=2});
-    ("ma1",{pce="Marshal";id=1});
-    ("l1",{pce="Lieutenant";id=1});
-    ("b1",{pce="Bomb";id=1});
-    ("b2",{pce="Bomb";id=2});
-    ("b3",{pce="Bomb";id=3});
-    ("sc2",{pce="Scout";id=2});
-    ("l2",{pce="Lieutenant";id=2});
+    ("min2",{pce="Miner";id=2});
+    ("mar1",{pce="Marshal";id=1});
+    ("lie1",{pce="Lieutenant";id=1});
+    ("bom1",{pce="Bomb";id=1});
+    ("bom2",{pce="Bomb";id=2});
+    ("bom3",{pce="Bomb";id=3});
+    ("sco2",{pce="Scout";id=2});
+    ("lie2",{pce="Lieutenant";id=2});
     ("ser2",{pce="Sergeant";id=2});
-    ("sc3",{pce="Scout";id=3}) ] in
+    ("cor1",{pce="Corporal";id=1}) ] in
   let ret_pce = (List.assoc pc pce_lst) in
   ret_pce
 
 (*Returns (-1,-1) if incorrect move format*)
 let extract_location_str (inp:string list) : string =
-  if (List.length inp)-1 = 2 then List.nth inp 2
-  else if (List.length inp)-1 = 3 && List.nth inp 2 = "to" then List.nth inp 3
+  if (List.length inp)-1 = 2 then (List.nth inp 2)
+  else if ((List.length inp)-1 = 3 && List.nth inp 2 = "to") then (List.nth inp 3)
   else "(-1,-1)"
 
 let extract_location (inp:string list) : int*int =
@@ -72,7 +72,7 @@ let extract_location (inp:string list) : int*int =
     | "(-1,-1)" -> (-1,-1)
     | _ -> (
       (*Checks if location has parentheses*)
-      let last =  (String.length loc_str) - 1 in
+      let last = (String.length loc_str) - 1 in
       let paren1 = (
         if ((String.contains loc_str '(') && (String.get loc_str 0) = '(') then true
         else false ) in
@@ -88,11 +88,11 @@ let extract_location (inp:string list) : int*int =
       | _    -> (
         if (paren1 && paren2) then
           let before_com =
-            (try int_of_string (String.sub loc_str 1 comma)
-            with | Not_found -> -1 ) in
+           (try int_of_string (String.sub loc_str 1 (comma-1))
+            with | Failure x -> -1 | Not_found -> -1) in
           let after_com  =
            (try int_of_string (String.sub loc_str comma (last - comma +1))
-            with | Not_found -> -1 ) in
+            with | Failure x -> -1 | Not_found -> -1) in
           (before_com,after_com)
         else
           (-1,-1)
@@ -115,7 +115,8 @@ let rec parse inp =
     | "board" -> Board
     | "gameboard" -> Board
     | "instructions" -> Instructions
-    | "new game" -> NewGame
+    | "new" -> NewGame
+    | "newgame" -> NewGame
     | "ng" -> NewGame
     | "move" -> (
       (*Extracting piece & location from user input*)
@@ -168,10 +169,10 @@ let new_game () =
   let sc2 = {pce="Scout";id=2} in
   let l2 = {pce="Lieutenant";id=2} in
   let ser2 = {pce="Sergeant";id=2} in
-  let sc3 = {pce="Scout";id=3} in
+  let cor1 = {pce="Corporal";id=1} in
   let piece_list =
     [sp1; sc1; cap1; maj1; f1; ser1; co1; mi1; g1; cap2; mi2; ma1; l1; b1; b2;
-    b3; sc2; l2; ser2; sc3]
+    b3; sc2; l2; ser2; cor1]
   in
   let rec build_human hum c pieces = (
     let new_board = making_game hum c in
@@ -181,7 +182,11 @@ let new_game () =
     else (
       print_string ("\n\nPlease place these pieces on the board: "^
         (piecelst_to_string pieces));
-      print_string "\n\nWhere would you like to place your next piece -> ";
+      print_string "\n\nWhere would you like to place your next piece?
+      Format: 'place <piece> <location>', where <piece> is the name of the
+      piece as listed in the list of pieces above, and <location> is the
+      location formatted as (row,column). ex: place Spy1 (2,3)
+      --> ";
       let input = read_line() in
       (* TODO: not yet fixed *)
       let place = parse input in
@@ -189,7 +194,11 @@ let new_game () =
       | Place (pi, loc) -> (
         if (List.mem pi pieces) then (
           let new_human = add_human hum c loc pi in
-          build_human new_human c (List.filter (fun x -> x <> pi) pieces)
+          if new_human = hum then
+            (* Need to try again, bad placement *)
+            build_human hum c pieces
+          else
+            build_human new_human c (List.filter (fun x -> x <> pi) pieces)
         )
         else (
           print_string "\n\nThis is not a valid piece";
@@ -197,7 +206,7 @@ let new_game () =
         )
       )
       | _ -> print_string "\n\nThis is not valid syntax for placing your pieces.
-                            \nPlease try placing a piece.";
+                            \nPlease try placing a piece.\n";
         build_human hum c pieces
     )
   ) in
@@ -247,7 +256,9 @@ let print_help () =
 
       [help] displays this menu again
       [quit] quits the game
-      [new game] will begin a new game
+      [new] will begin a new game
+      [place <piece> <location>] will place the piece (such as Spy1) at
+        location (formatted as '(row,column)') in the board
       [instructions] will print out the instructions on how to play the game
       [move piece location] will move the [piece] to the desired [location].
         - Pieces are named with the first 3 letters and its id
@@ -308,9 +319,9 @@ let print_instructions () =
         \n"
 
 let print_intro () : unit =
-  print_string "Type 'help' to revisit the list of commands, type 'newgame' to\n
-                get started, 'instructions' to understand how to play, or 'quit'\n
-                if you just aren't up for the challenge right now.\n\n"
+  print_string "  Type 'help' to revisit the list of commands, type 'new' to
+  get started, 'instructions' to understand how to play, or 'quit'
+  if you just aren't up for the challenge right now.\n"
 
 (*TODO: Print function for when a player wins. Add in restart capabilities*)
 (* let check_for_win gamestate : bool =
@@ -324,7 +335,6 @@ let print_intro () : unit =
 
 (****************************GAME PLAY REPL*************************************)
 
-(*NOTE: gamestate now takes in a gamestate option; need to make appropriate changes*)
 (*TODO: I took out bool in the (bool*gamestate) tuple so need to actually change
  the "turn" field in gamestate at each stage for whose turn it is *)
 (*TODO: process needs to return a unit because this is the main repl function.
@@ -347,7 +357,7 @@ let rec process gamestate =
   | Move (pce,loc) -> (
       match gamestate with
       | None -> (
-           print_string "You must start the game before you can print your pieces!\n";
+          print_string "You must start the game before you can move your pieces!\n";
           print_intro ();
           process None)
       | Some g -> (
@@ -355,7 +365,7 @@ let rec process gamestate =
     )
   | Place (p,l) -> (
       match gamestate with
-      | None -> failwith "unimplemented"
+      | None -> print_string "Initialization failed. Please quit and try again."
       | Some g -> (
         print_string "You have already placed all of your pieces!\n";
         process gamestate )
