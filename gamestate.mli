@@ -27,7 +27,7 @@ val newplayer : bytes -> (piece*location) list -> player
 (* Initializes game state from user input and computer generated setup *)
 val making_game : player -> player -> game_board
 
-val add_human: player -> player -> location -> piece -> game_board
+val add_human: player -> player -> location -> piece -> player
 
 (* Initializes game state from user input and computer generated setup *)
 val new_gamestate : player -> player -> gamestate
@@ -68,7 +68,7 @@ val add_to_board : game_board -> player -> piece -> location ->
 *   calls attack function and updates board
 * If validate_move returns false,
 *   asks player to try a different move *)
-val move : gamestate -> player -> piece -> location -> (bool*gamestate)
+val move : gamestate -> player -> piece -> location -> gamestate option
 
 (* [print_game_board game_board] Prints the current game_board *)
 val print_game_board : game_board -> unit
