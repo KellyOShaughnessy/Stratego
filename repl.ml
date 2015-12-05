@@ -36,24 +36,24 @@ let print_retry () =
 
 let extract_piece (pc:string) : piece =
   let pce_lst = [
-    ("sp1",{pce="Spy";id=1});
-    ("sc1", {pce="Scout";id=1});
+    ("spy1",{pce="Spy";id=1});
+    ("sco1", {pce="Scout";id=1});
     ("cap1",{pce="Captain";id=1});
     ("maj1",{pce="Major";id=1});
-    ("f1",{pce="Flag";id=1});
+    ("fla1",{pce="Flag";id=1});
     ("ser1",{pce="Sergeant";id=1});
-    ("co1",{pce="Colonel";id=1});
-    ("mi1",{pce="Miner";id=1});
-    ("g1",{pce="General";id=1});
+    ("col1",{pce="Colonel";id=1});
+    ("min1",{pce="Miner";id=1});
+    ("gen1",{pce="General";id=1});
     ("cap2",{pce="Captain";id=2});
-    ("mi2",{pce="Miner";id=2});
-    ("ma1",{pce="Marshal";id=1});
-    ("l1",{pce="Lieutenant";id=1});
-    ("b1",{pce="Bomb";id=1});
-    ("b2",{pce="Bomb";id=2});
-    ("b3",{pce="Bomb";id=3});
-    ("sc2",{pce="Scout";id=2});
-    ("l2",{pce="Lieutenant";id=2});
+    ("min2",{pce="Miner";id=2});
+    ("mar1",{pce="Marshal";id=1});
+    ("lie1",{pce="Lieutenant";id=1});
+    ("bom1",{pce="Bomb";id=1});
+    ("bom2",{pce="Bomb";id=2});
+    ("bom3",{pce="Bomb";id=3});
+    ("sco2",{pce="Scout";id=2});
+    ("lie2",{pce="Lieutenant";id=2});
     ("ser2",{pce="Sergeant";id=2});
     ("cor1",{pce="Corporal";id=1}) ] in
   let ret_pce = (List.assoc pc pce_lst) in
@@ -61,8 +61,8 @@ let extract_piece (pc:string) : piece =
 
 (*Returns (-1,-1) if incorrect move format*)
 let extract_location_str (inp:string list) : string =
-  if (List.length inp)-1 = 2 then List.nth inp 2
-  else if (List.length inp)-1 = 3 && List.nth inp 2 = "to" then List.nth inp 3
+  if (List.length inp)-1 = 2 then (List.nth inp 2)
+  else if ((List.length inp)-1 = 3 && List.nth inp 2 = "to") then (List.nth inp 3)
   else "(-1,-1)"
 
 let extract_location (inp:string list) : int*int =
@@ -115,7 +115,8 @@ let rec parse inp =
     | "board" -> Board
     | "gameboard" -> Board
     | "instructions" -> Instructions
-    | "new game" -> NewGame
+    | "new" -> NewGame
+    | "newgame" -> NewGame
     | "ng" -> NewGame
     | "move" -> (
       (*Extracting piece & location from user input*)
@@ -247,7 +248,7 @@ let print_help () =
 
       [help] displays this menu again
       [quit] quits the game
-      [new game] will begin a new game
+      [new] will begin a new game
       [instructions] will print out the instructions on how to play the game
       [move piece location] will move the [piece] to the desired [location].
         - Pieces are named with the first 3 letters and its id
@@ -308,7 +309,7 @@ let print_instructions () =
         \n"
 
 let print_intro () : unit =
-  print_string "Type 'help' to revisit the list of commands, type 'newgame' to\n
+  print_string "Type 'help' to revisit the list of commands, type 'new' to\n
                 get started, 'instructions' to understand how to play, or 'quit'\n
                 if you just aren't up for the challenge right now.\n\n"
 

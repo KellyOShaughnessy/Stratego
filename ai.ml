@@ -2,7 +2,8 @@ open Gamestate
 open Random
 open Int64
 
-(* TODO: implement this! This is just for setting up the game_state right now *)
+(* [setup] selects one of four initial piece placements for the computer
+* and returns the piece list *)
 let setup () =
   let sp1 = {pce="Spy";id=1} in
   let sc1 = {pce="Scout";id=1} in
@@ -126,25 +127,16 @@ let setup () =
   in
   newplayer "comp" start_list
 
-(* 1 spy
-2 scouts
-1 Corporal
-2 captains
-1 major
-1 flag
-2 sergeants
-3 bombs
-1 marshall
-1 colonel
-2 miners
-2 lieutenants
-1 gen  *)
-
-let opp_piece_exists gamestate cur_location end_dest =
-  match List.assoc cur_location gamestate.gb with
+(* [opp_piece_exists gamestate end_dest] checks if there
+* exists an opposing player's piece at the end destination *)
+let opp_piece_exists gamestate end_dest =
+  match List.assoc end_dest gamestate.gb with
   | None -> false
   | Some (piece,player) -> player.name = "human"
 
+(* [choose_destination gamestate piece cur_location tried_locations]
+* returns: a location type option that is a valid move for the selected piece
+* to move to. If that piece has no valid moves, returns None *)
 let rec choose_destination gamestate piece cur_location tried_locations =
   if List.length tried_locations < 4 then
     let up = (fst cur_location - 1, snd cur_location) in
@@ -153,13 +145,13 @@ let rec choose_destination gamestate piece cur_location tried_locations =
     let left = (fst cur_location, snd cur_location + 1) in
 
     let end_dest =
-      (if opp_piece_exists gamestate cur_location up then
+      (if opp_piece_exists gamestate up then
         up
-      else if opp_piece_exists gamestate cur_location right then
+      else if opp_piece_exists gamestate right then
         right
-      else if opp_piece_exists gamestate cur_location left then
+      else if opp_piece_exists gamestate left then
         left
-      else if opp_piece_exists gamestate cur_location down then
+      else if opp_piece_exists gamestate down then
         down
       else
         (if List.mem up tried_locations then
@@ -187,7 +179,10 @@ let rec choose_destination gamestate piece cur_location tried_locations =
   else
     None
 
-
+(* [choose_piece player movable_pieces] selects a movable piece from the
+* list of pieces on the board for the computer and returns an option
+* containing the piece to move and the location of that piece. If there
+* is no possible piece to move, returns None *)
 let choose_piece player movable_pieces  =
   if List.length movable_pieces > 0 then
     let index64 = Random.int64 (of_int (List.length movable_pieces)) in

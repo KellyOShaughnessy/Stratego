@@ -446,19 +446,19 @@ let move gamestate player piece end_location =
 
 let piece_to_string (piece:piece) =
   match piece.pce with
-  | "Flag" -> "Fla "^(string_of_int piece.id)
-  | "Bomb" -> "Bom "^(string_of_int piece.id)
-  | "Spy" -> "Spy "^(string_of_int piece.id)
-  | "Scout" -> "Sco "^(string_of_int piece.id)
-  | "Marshal" -> "Mar "^(string_of_int piece.id)
-  | "General" -> "Gen "^(string_of_int piece.id)
-  | "Miner" -> "Min "^(string_of_int piece.id)
-  | "Colonel" -> "Col "^(string_of_int piece.id)
-  | "Major" -> "Maj "^(string_of_int piece.id)
-  | "Captain" -> "Cap "^(string_of_int piece.id)
-  | "Lieutenant" -> "Lie "^(string_of_int piece.id)
-  | "Sergeant" -> "Ser "^(string_of_int piece.id)
-  | "Corporal" -> "Cor "^(string_of_int piece.id)
+  | "Flag" -> "Fla"^(string_of_int piece.id)
+  | "Bomb" -> "Bom"^(string_of_int piece.id)
+  | "Spy" -> "Spy"^(string_of_int piece.id)
+  | "Scout" -> "Sco"^(string_of_int piece.id)
+  | "Marshal" -> "Mar"^(string_of_int piece.id)
+  | "General" -> "Gen"^(string_of_int piece.id)
+  | "Miner" -> "Min"^(string_of_int piece.id)
+  | "Colonel" -> "Col"^(string_of_int piece.id)
+  | "Major" -> "Maj"^(string_of_int piece.id)
+  | "Captain" -> "Cap"^(string_of_int piece.id)
+  | "Lieutenant" -> "Lie"^(string_of_int piece.id)
+  | "Sergeant" -> "Ser"^(string_of_int piece.id)
+  | "Corporal" -> "Cor"^(string_of_int piece.id)
   | _ -> failwith "not a piece"
 
 let piecelst_to_string (ls: piece list): string=
