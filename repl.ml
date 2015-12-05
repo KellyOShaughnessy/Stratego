@@ -1,16 +1,55 @@
 open Gamestate
 open Ai
+(* NOTE: WHEN COMPILING, USE 'cs3110 compile -p str repl.ml' *)
 
-(* Defining possible movement direction *)
-(* type dir = Up | Down | Left | Right *)
 (* Defining possible commands *)
 type cmd =
   | Quit
   | NewGame
-  | Help of bytes
+  | Help
   | Move of (piece*location)
+  | Place of (piece*location)
+  | Invalid
+  | Pieces
+  | Graveyard
+  | Board
+  | Instructions
 
-let prompt gamestate = failwith "unimplemented"
+(*We should have a start function where it prints the directions and then
+ *starts prompt.*)
+(*Could also have functions that print*)
+let fix_input (inp:string) : string list =
+  (*lowercase & get rid of extraneous characters*)
+  let input_lower = String.lowercase inp in
+  let input_better = Str.global_replace (Str.regexp "[^0-9a-zA-Z ]+") "" input_lower in
+  (*splits into list*)
+  let regex = Str.regexp " +" in
+  let ret_list = Str.split regex input_better in
+  ret_list
+
+let rec parse () =
+  print_string "\n\nPlease type a command -->";
+  let input = fix_input (read_line()) in
+  let fst_cmd = List.nth input 0 in
+  (* Extracting cmd type from input *)
+  let cmd = match fst_cmd with
+      "quit" -> Quit
+    | "q" -> Quit
+    | "exit" -> Quit
+    | "help" -> Help
+    | "h" -> Help
+    | "pieces" -> Pieces
+    | "graveyard" -> Graveyard
+    | "gy" -> Graveyard
+    | "board" -> Board
+    | "gameboard" -> Board
+    | "instructions" -> Instructions
+    | "new game" -> NewGame
+    | "ng" -> NewGame
+    | "move" -> failwith "unimplemented"
+    | "place" -> failwith "unimplemented"
+    | _ -> print_string "\n\nWhat was that again?" ; parse ()
+  in cmd
 
 let new_game () =
   (* let comp = setup () in *)
@@ -47,9 +86,8 @@ let print_graveyard player =
       player.graveyard);
   print_newline ()
 
-let print_help input gamestate =
-  match input with
-  | "help" -> Printf.printf "
+let print_help () =
+  Printf.printf "
       This is the help menu for Stratego. The following
       are commands to help you understand the game and remind you of the
       current state of the game:
@@ -66,7 +104,8 @@ let print_help input gamestate =
       [graveyard] prints the list of your pieces in your graveyard
       [board] prints the current game board, displaying your pieces and
         the computer's pieces as X's \n \n"
-  | "pieces" -> print_piece_list gamestate.human
+
+  (* | "pieces" -> print_piece_list gamestate.human
   | "graveyard" -> print_graveyard gamestate.human
   | "board" -> print_game gamestate
   | "instructions" -> print_endline "
@@ -110,15 +149,22 @@ let print_help input gamestate =
           attacking player loses piece and bomb is
           removed from board.
         \n"
-    | _ -> Printf.printf "Not a valid help command, please try again. \n"
+    | _ -> Printf.printf "Not a valid help command, please try again. \n" *)
 
 let process gamestate cmd =
   match cmd with
   | Quit -> (false, quit gamestate)
   | NewGame -> (true, new_game ())
-  | Help s -> print_help s gamestate; (false, gamestate)
+  | Help -> print_help (); (false, gamestate)
   | Move (pce,loc) ->
       move gamestate gamestate.turn pce loc
+  | Place (p,l) -> failwith "unimplemented"
+  | Pieces -> failwith "unimplemented"
+  | Graveyard -> failwith "unimplemented"
+  | Board -> failwith "unimplemented"
+  | Instructions -> failwith "unimplemented"
+  | _ -> failwith "unimplemented"
 
-let () =
-  Printf.printf "\nWelcome to Stratego!\n\n"
+(* let () =
+  Printf.printf "\nWelcome to Stratego!\n\n" *)
+
