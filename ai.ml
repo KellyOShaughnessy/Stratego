@@ -174,7 +174,9 @@ let rec choose_destination gamestate piece cur_location tried_locations =
       choose_destination gamestate piece cur_location tried_locations
     else
       match  validate_move gamestate.gb gamestate.comp piece end_dest with
-      | (false, _) -> choose_destination gamestate piece cur_location (end_dest::tried_locations)
+      | (false, _) ->
+          choose_destination gamestate piece
+            cur_location (end_dest::tried_locations)
       | (true, _) -> Some end_dest)
   else
     None
@@ -210,12 +212,14 @@ let rec next_move gamestate flag_locations recent_move tried_moves =
         (match choose_destination gamestate pce_to_move cur_location [] with
           | None ->
             (* Piece is immovable, try again with new piece *)
-            next_move gamestate flag_locations recent_move (pce_to_move::tried_moves)
+            next_move gamestate flag_locations
+              recent_move (pce_to_move::tried_moves)
           | Some loc -> Some (pce_to_move, loc)))
     | Some (pce_to_move,cur_location) ->
       (* Move this piece until something happens with it *)
       (match choose_destination gamestate pce_to_move cur_location [] with
-        | None -> next_move gamestate flag_locations None (pce_to_move::tried_moves)
+        | None ->
+            next_move gamestate flag_locations None (pce_to_move::tried_moves)
         | Some loc -> Some (pce_to_move, loc))
   else
     (* No possible moves for any pieces, computer loses! *)
