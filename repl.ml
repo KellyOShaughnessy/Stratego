@@ -206,8 +206,8 @@ let new_game () =
         )
       )
       | _ -> print_string "\n\nThis is not valid syntax for placing your pieces.
-                            \nPlease try placing a piece.\n\n";
-        build_human hum c pieces
+                            Please try placing a piece again.\n\n";
+            build_human hum c pieces
     )
   ) in
   let empty_hum = newplayer "human" [] in
