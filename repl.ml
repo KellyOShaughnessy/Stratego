@@ -55,7 +55,7 @@ let extract_piece (pc:string) : piece =
     ("sc2",{pce="Scout";id=2});
     ("l2",{pce="Lieutenant";id=2});
     ("ser2",{pce="Sergeant";id=2});
-    ("sc3",{pce="Scout";id=3}) ] in
+    ("cor1",{pce="Corporal";id=1}) ] in
   let ret_pce = (List.assoc pc pce_lst) in
   ret_pce
 
@@ -168,10 +168,10 @@ let new_game () =
   let sc2 = {pce="Scout";id=2} in
   let l2 = {pce="Lieutenant";id=2} in
   let ser2 = {pce="Sergeant";id=2} in
-  let sc3 = {pce="Scout";id=3} in
+  let cor1 = {pce="Corporal";id=1} in
   let piece_list =
     [sp1; sc1; cap1; maj1; f1; ser1; co1; mi1; g1; cap2; mi2; ma1; l1; b1; b2;
-    b3; sc2; l2; ser2; sc3]
+    b3; sc2; l2; ser2; cor1]
   in
   let rec build_human hum c pieces = (
     let new_board = making_game hum c in
@@ -258,7 +258,7 @@ let print_help () =
         - Pieces are named with the first 3 letters and its id
         (ex: Miner with id 1 is 'Min 1').
         - Location is (row,column) as defined on the board
-      [pieces] prints the list of your pieces on the board and their location
+      [pieces] prints the list of your pieces on the board and their location. \n
       [graveyard] prints the list of your pieces in your graveyard
       [board] prints the current game board, displaying your pieces and
         the computer's pieces as X's \n \n"
@@ -289,25 +289,25 @@ let print_instructions () =
       - The following are the piece rankings and special cases, assume that
         any piece, unless noted otherwise, can only move 1 space at a time:
 
-        Spy:  rank = 1
-        Scout (Sco): rank = 2  Can move any number of spaces on
+        Spy:  rank = 1, Quantity: 1
+        Scout (Sco): rank = 2, Quantity: 2,  Can move any number of spaces on
           the board as long as there are no obstacles between
           start and end locations.
-        Miner (Min) = 3. Can defuse bombs
+        Miner (Min) = rank =3, Quantity: 2, Can defuse bombs
           (miner attacks bomb and remains on board).
-        Corporal (Cor) = 4.
-        Sergeant (Ser) = 5
-        Lieutenant (Lie) = 6
-        Captain (Cap) = 7. Can move up to two spaces on the
+        Corporal (Cor) = rank = 4, Quantity: 1
+        Sergeant (Ser) = rank = 5, Quantity: 2
+        Lieutenant (Lie) = rank = 6, Quantity: 2
+        Captain (Cap) = rank = 7, Quantity: 2, Can move up to two spaces on the
           board as long as there are no obstacles between
           start and end locations
-        Major (Maj) = 8
-        Colonel (Col) = 9n
-        General (Gen) = 10
-        Marshal (Mar) = 11
-        Flag (Fla) = No rank and immovable, but when attacked,
+        Major (Maj) = rank = 8, Quantity: 1
+        Colonel (Col) = rank = 9, Quantity: 1
+        General (Gen) = rank = 10, Quantity: 1
+        Marshal (Mar) = rank = 11, Quantity: 1
+        Flag (Fla) = Quantity: 1, No rank and immovable, but when attacked,
           game ends and attacking player wins the game
-        Bomb (Bom) = No rank and immovable, but when attacked,
+        Bomb (Bom) = Quantity: 3, No rank and immovable, but when attacked,
           attacking player loses piece and bomb is
           removed from board.
         \n"
