@@ -375,8 +375,7 @@ I commented out all of move and replaced it with "Some(gamestate) to remind us
 to do this and so that it would compile."
 *)
 let move gamestate player piece end_location =
-  Some(gamestate)
-  (* let start_location = get_location player piece in
+  let start_location = get_location player piece in
   let game_board = gamestate.gb in
   match validate_move game_board player piece end_location with
   | (true, Some opp_piece) ->
@@ -396,7 +395,7 @@ let move gamestate player piece end_location =
             else
               {changed_gs with human = new_opp_player; comp = new_player})
           in
-          (true, new_gs)
+          Some new_gs
       | Some (pce,plyr) ->
           let (removed_start_gb, new_player) = remove_from_board game_board
                                                 player piece start_location in
@@ -411,11 +410,11 @@ let move gamestate player piece end_location =
             let new_opp = {gamestate.comp with pieces=new_opp_pieces; graveyard
                = new_opp_graveyard} in
             if new_player.name = "human" then
-              (true,{gamestate with human = newer_player; comp = new_opp;
-                gb=add_end_gb})
+              Some {gamestate with human = newer_player; comp = new_opp;
+                gb=add_end_gb}
             else
-              (true,{gamestate with comp = newer_player; human = new_opp;
-                gb=add_end_gb})
+              Some {gamestate with comp = newer_player; human = new_opp;
+                gb=add_end_gb}
           else
               let (add_end_gb, opp_player) = add_to_board removed_start_gb
                                                   gamestate.comp pce
@@ -425,11 +424,11 @@ let move gamestate player piece end_location =
               let new_pl = {new_player with pieces=new_pl_pieces; graveyard =
                 new_pl_graveyard} in
               if new_player.name = "human" then
-                (true,{gamestate with human = new_pl; comp=opp_player;
-                  gb=add_end_gb})
+                Some {gamestate with human = new_pl; comp=opp_player;
+                  gb=add_end_gb}
               else
-                (true,{gamestate with comp = new_pl; human=opp_player;
-                  gb=add_end_gb})
+                Some {gamestate with comp = new_pl; human=opp_player;
+                  gb=add_end_gb}
       )
   | (true, None) ->
       let (removed_gb,new_player) = remove_from_board game_board player
@@ -439,10 +438,10 @@ let move gamestate player piece end_location =
                                       piece end_location
       in
       if player.name="human" then
-        (true,{gamestate with gb = added_gb; human = newer_player})
+        Some {gamestate with gb = added_gb; human = newer_player}
       else
-        (true,{gamestate with gb = added_gb; comp = newer_player})
-  | (false, _) -> (false, gamestate) *)
+        Some {gamestate with gb = added_gb; comp = newer_player}
+  | (false, _) -> None
 
 
 let piece_to_string (piece:piece) =
