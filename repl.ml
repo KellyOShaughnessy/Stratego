@@ -31,19 +31,24 @@ let rec parse () =
   let input = fix_input (read_line()) in
   let fst_cmd = List.nth input 0 in
   (* Extracting cmd type from input *)
-  let cmd = (
-    if (fst_cmd = "quit" || fst_cmd = "q" || fst_cmd = "exit") then Quit
-    else if (fst_cmd = "new game" || fst_cmd = "ng") then NewGame
-    else if (fst_cmd = "help" || fst_cmd = "h") then Help
-    else if (fst_cmd = "move" || fst_cmd = "m") then
-        failwith "unimplemented"
-    else if (fst_cmd = "place" || fst_cmd =  "p" || fst_cmd = "put") then
-        failwith "unimplemented"
-    else let () = print_string "\n\nWhat was that again?" in Invalid
-    ) in
-  match cmd with
-  | Invalid -> parse ()
-  | _ -> cmd
+  let cmd = match fst_cmd with
+      "quit" -> Quit
+    | "q" -> Quit
+    | "exit" -> Quit
+    | "help" -> Help
+    | "h" -> Help
+    | "pieces" -> Pieces
+    | "graveyard" -> Graveyard
+    | "gy" -> Graveyard
+    | "board" -> Board
+    | "gameboard" -> Board
+    | "instructions" -> Instructions
+    | "new game" -> NewGame
+    | "ng" -> NewGame
+    | "move" -> failwith "unimplemented"
+    | "place" -> failwith "unimplemented"
+    | _ -> print_string "\n\nWhat was that again?" ; parse ()
+  in cmd
 
 let new_game () = failwith "unimplemented"
 
