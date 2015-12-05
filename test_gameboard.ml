@@ -310,10 +310,9 @@ TEST "building game_board" = (making_game hum computer) = game_board
 (* Testing adding a piece to the human list *)
 TEST "add_human" = (
   let piece = {pce= "Spy"; id = 2} in
-  let newboard = add_human hum computer (3,1) piece in
-  List.assoc (3,1) newboard
-  ) = Some({pce= "Spy"; id = 2}, {hum with
-    pieces=hum.pieces@[({pce= "Spy"; id = 2},(3,1))]})
+  let newhuman = add_human (newplayer "human" []) computer (2,1) piece in
+  List.assoc (2,1) (making_game newhuman computer)
+  ) = Some({pce= "Spy"; id = 2}, (newplayer "human" [({pce= "Spy"; id = 2},(2,1))]))
 
 (* Testing new game state *)
 TEST "new_gamestate" = new_gamestate hum computer =

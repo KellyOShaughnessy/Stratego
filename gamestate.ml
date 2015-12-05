@@ -76,12 +76,17 @@ let making_game h c =
   new2
 
 let add_human (h: player) (c: player) (loc: location)
-  (p: piece): game_board =
+  (p: piece): player =
   let pieces = h.pieces in
-  let newp = pieces@[(p,loc)] in
-  let human = {name= h.name; pieces = newp; graveyard = h.graveyard; won=false}
-  in
-  making_game human c
+  if ((fst loc) <= 2 && (fst loc) > 0 && (snd loc) <= 10 && (fst loc) > 0)
+    then (
+      let newp = pieces@[(p,loc)] in
+      let human = {name= h.name; pieces = newp; graveyard = h.graveyard; won=false}
+      in
+      human
+    )
+  else failwith "You cannot place a piece here"
+
 
 
 (* Initializes game state from user input and computer generated setup *)

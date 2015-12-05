@@ -27,7 +27,7 @@ val newplayer : bytes -> (piece*location) list -> player
 (* Initializes game state from user input and computer generated setup *)
 val making_game : player -> player -> game_board
 
-val add_human: player -> player -> location -> piece -> game_board
+val add_human: player -> player -> location -> piece -> player
 
 (* Initializes game state from user input and computer generated setup *)
 val new_gamestate : player -> player -> gamestate

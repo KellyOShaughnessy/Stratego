@@ -15,6 +15,9 @@ type cmd =
   | Board
   | Instructions
 
+let print_game gamestate =
+  print_gamestate gamestate
+
 (*We should have a start function where it prints the directions and then
  *starts prompt.*)
 (*Could also have functions that print*)
@@ -27,9 +30,11 @@ let fix_input (inp:string) : string list =
   let ret_list = Str.split regex input_better in
   ret_list
 
-let rec parse () =
-  print_string "\n\nPlease type a command -->";
-  let input = fix_input (read_line()) in
+let rec parse stringed =
+  (* TODO: move this *)
+(*   print_string "\n\nPlease type a command -->";
+ *)
+  let input = fix_input (stringed) in
   let fst_cmd = List.nth input 0 in
   (* Extracting cmd type from input *)
   let cmd = match fst_cmd with
@@ -48,21 +53,64 @@ let rec parse () =
     | "ng" -> NewGame
     | "move" -> failwith "unimplemented"
     | "place" -> failwith "unimplemented"
-    | _ -> print_string "\n\nWhat was that again?" ; parse ()
+    | _ -> print_string "\n\nWhat was that again? " ; parse (read_line ())
   in cmd
 
 let new_game () =
-(*   let comp = setup () in
-  let rec build_human hum c =
-    if (List.length human.pieces = List.length comp.pieces)
-      then new_gamestate hum c
+  let comp = setup () in
+  let sp1 = {pce="Spy";id=1} in
+  let sc1 = {pce="Scout";id=1} in
+  let cap1 = {pce="Captain";id=1} in
+  let maj1 = {pce="Major";id=1} in
+  let f1 = {pce="Flag";id=1} in
+  let ser1 = {pce="Sergeant";id=1} in
+  let co1 = {pce="Colonel";id=1} in
+  let mi1 = {pce="Miner";id=1} in
+  let g1 = {pce="General";id=1} in
+  let cap2 = {pce="Captain";id=2} in
+  let mi2 = {pce="Miner";id=2} in
+  let ma1 = {pce="Marshal";id=1} in
+  let l1 = {pce="Lieutenant";id=1} in
+  let b1 = {pce="Bomb";id=1} in
+  let b2 = {pce="Bomb";id=2} in
+  let b3 = {pce="Bomb";id=3} in
+  let sc2 = {pce="Scout";id=2} in
+  let l2 = {pce="Lieutenant";id=2} in
+  let ser2 = {pce="Sergeant";id=2} in
+  let sc3 = {pce="Scout";id=3} in
+  let piece_list =
+    [sp1; sc1; cap1; maj1; f1; ser1; co1; mi1; g1; cap2; mi2; ma1; l1; b1; b2;
+    b3; sc2; l2; ser2; sc3]
+  in
+  let rec build_human hum c pieces = (
+    let new_board = making_game hum c in
+    print_game_board new_board;
+    if (List.length hum.pieces = List.length comp.pieces && pieces = [])
+      then (let newer = new_gamestate hum c in newer)
     else (
-      let place = prompt (print_string "Please, place the next piece: ") in
+      print_string ("\n\nPlease place these pieces on the board: "^
+        (piecelst_to_string pieces));
+      print_string "\n\nWhere would you like to place your next piece -> ";
+      let input = read_line() in
+      (* TODO: not yet fixed *)
+      let place = parse input in
       match place with
-      |
-
-    ) *)
-  failwith "unimplemented"
+      | Place (pi, loc) -> (
+        if (List.mem pi pieces) then (
+          let new_human = add_human hum c loc pi in
+          build_human new_human c (List.filter (fun x -> x <> pi) pieces)
+        )
+        else (
+          print_string "\n\nThis is not a valid piece";
+          build_human hum c pieces
+        )
+      )
+      | _ -> print_string "\n\nPlease place all of your pieces";
+        build_human hum c pieces
+    )
+  ) in
+  let empty_hum = newplayer "human" [] in
+  build_human empty_hum comp piece_list
 
 let quit gamestate = failwith "unimplemented"
 (*   let rec quitted (game: gamestate):unit = (
@@ -75,9 +123,6 @@ let quit gamestate = failwith "unimplemented"
     )
   in quitted gamestate
  *)
-
-let print_game gamestate =
-  print_gamestate gamestate
 
 let print_piece_list player =
   Printf.printf "     Your list of pieces \n";
@@ -174,6 +219,9 @@ let process gamestate cmd =
   | Instructions -> failwith "unimplemented"
   | _ -> failwith "unimplemented"
 
-(* let () =
-  Printf.printf "\nWelcome to Stratego!\n\n" *)
+
+let () =
+  Printf.printf "\nWelcome to Stratego!\n\n";
+  let gs = new_game () in
+  print_game gs;
 
