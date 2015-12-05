@@ -4,11 +4,12 @@ open Int64
 
 (* [setup game_board] takes the the pieces for the computer player
 during initialization *)
-val setup         : unit -> player
+val setup : unit -> player
 
 (* [choose_destination gamestate piece] takes a gamestate and a piece
 * and returns an end location for that piece *)
-val choose_destination     : gamestate -> piece -> location -> location list -> location option
+val choose_destination  : gamestate -> piece -> location
+  -> location list -> location option
 
 val choose_piece : player -> (piece*location) list -> (piece*location) option
 
@@ -24,4 +25,5 @@ val choose_piece : player -> (piece*location) list -> (piece*location) option
 *   equals the number of pieces that are movable by the computer on the board,
 *   then there are no possible moves and we return None to signify that
 *   the computer lost.  *)
-val next_move : gamestate -> location list -> ((piece*location) option) -> piece list -> ((piece*location) option)
+val next_move : gamestate -> location list -> ((piece*location) option)
+  -> piece list -> ((piece*location) option)

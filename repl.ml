@@ -72,7 +72,7 @@ let extract_location (inp:string list) : int*int =
     | "(-1,-1)" -> (-1,-1)
     | _ -> (
       (*Checks if location has parentheses*)
-      let last =  (String.length loc_str) - 1 in
+      let last = (String.length loc_str) - 1 in
       let paren1 = (
         if ((String.contains loc_str '(') && (String.get loc_str 0) = '(') then true
         else false ) in
@@ -182,7 +182,11 @@ let new_game () =
     else (
       print_string ("\n\nPlease place these pieces on the board: "^
         (piecelst_to_string pieces));
-      print_string "\n\nWhere would you like to place your next piece -> ";
+      print_string "\n\nWhere would you like to place your next piece?
+      Format: 'place <piece> <location>', where <piece> is the name of the
+      piece as listed in the list of pieces above, and <location> is the
+      location formatted as (row,column). ex: place Spy1 (2,3)
+      --> ";
       let input = read_line() in
       (* TODO: not yet fixed *)
       let place = parse input in
@@ -190,7 +194,11 @@ let new_game () =
       | Place (pi, loc) -> (
         if (List.mem pi pieces) then (
           let new_human = add_human hum c loc pi in
-          build_human new_human c (List.filter (fun x -> x <> pi) pieces)
+          if new_human = hum then
+            (* Need to try again, bad placement *)
+            build_human hum c pieces
+          else
+            build_human new_human c (List.filter (fun x -> x <> pi) pieces)
         )
         else (
           print_string "\n\nThis is not a valid piece";
@@ -249,6 +257,8 @@ let print_help () =
       [help] displays this menu again
       [quit] quits the game
       [new] will begin a new game
+      [place <piece> <location>] will place the piece (such as Spy1) at
+        location (formatted as '(row,column)') in the board
       [instructions] will print out the instructions on how to play the game
       [move piece location] will move the [piece] to the desired [location].
         - Pieces are named with the first 3 letters and its id
@@ -325,7 +335,6 @@ let print_intro () : unit =
 
 (****************************GAME PLAY REPL*************************************)
 
-(*NOTE: gamestate now takes in a gamestate option; need to make appropriate changes*)
 (*TODO: I took out bool in the (bool*gamestate) tuple so need to actually change
  the "turn" field in gamestate at each stage for whose turn it is *)
 (*TODO: process needs to return a unit because this is the main repl function.
@@ -348,7 +357,7 @@ let rec process gamestate =
   | Move (pce,loc) -> (
       match gamestate with
       | None -> (
-          print_string "You must start the game before you can print your pieces!\n";
+          print_string "You must start the game before you can move your pieces!\n";
           print_intro ();
           process None)
       | Some g -> (
