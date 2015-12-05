@@ -1,4 +1,5 @@
 open Gamestate
+open Str
 
 (* repl.mli:
     Facilitates interaction between the game and the user.
@@ -13,13 +14,15 @@ open Gamestate
 type cmd =
   | Quit
   | NewGame
-  | Help of bytes
+  | Help
   | Move of (piece*location)
+  | Place of (piece*location)
+  | Invalid
 
 (* [prompt gamestate] prompts user for next move
  * - returns a tuple of the next direction and the amount of spaces to move
  * parses the input text and gives the command. *)
-val prompt      : gamestate -> cmd
+val parse       : unit -> cmd
 
 (* [print_game gamestate] prints the gameboard.*)
 val print_game  : gamestate -> unit

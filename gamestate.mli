@@ -13,11 +13,7 @@ and piece = {pce:string; id:int;}
   | Lieutenant of int
   | Sergeant of int
   | Corporal of int *)
-<<<<<<< HEAD
-and player = {name: bytes; pieces : (piece*location) list; graveyard : piece list ; won: bool}
-=======
 and player = {name: bytes; pieces : (piece*location) list; graveyard : piece list; won: bool}
->>>>>>> master
 
 (* Using ocaml-matrix, make_matrix
 * piece is the piece in that location with the string of the player,
