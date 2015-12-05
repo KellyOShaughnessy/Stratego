@@ -183,7 +183,7 @@ let game_board =
 
 (* -------------------------TESTING VALIDATE_MOVE---------------------------- *)
 (*TODO CANNOT COMPLETE TESTING UNTIL GET LOCATION IS DONE*)
-
+TEST "newplayer" = (newplayer "human" human_list) = hum
 
 (* Tests that Bomb and Flag cannot move *)
 TEST = (validate_move game_board hum b1 (2,5)) = (false,None)

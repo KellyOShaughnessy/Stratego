@@ -1,35 +1,26 @@
 type location = (int * int)
-and piece = {pce:string; id:int;}
-(*   | Flag
-  | Bomb
-  | Spy of int
-  | Scout of int
-  | Marshal of int
-  | General of int
-  | Miner of int
-  | Colonel of int
-  | Major of int
-  | Captain of int
-  | Lieutenant of int
-  | Sergeant of int
-  | Corporal of int *)
-and player = {name: bytes; pieces : (piece*location) list; graveyard : piece list; won: bool}
 
-(* Using ocaml-matrix, make_matrix
-* piece is the piece in that location with the string of the player,
-* None if location is empty
-type game_board = ((piece*player) option) array array *)
+and piece = {pce:string; id:int;}
+
+and player = {name: bytes; pieces : (piece*location) list;
+  graveyard : piece list; won: bool}
 
 (* Store each location on the game board and a (piece*player) option
   so that the value is None if the location is empty and
   Some(piece, player) if the position currently holds a piece *)
-type game_board = (location*((piece*player) option)) list
+and game_board = (location*((piece*player) option)) list
 
-type gamestate = {gb : game_board ; human : player;
+and gamestate = {gb : game_board ; human : player;
                   comp : player; turn: player}
+
+(*get the rank of the piece during attack *)
+val get_rank : piece -> int
 
 (* creates a game_board with all locations initilized to None *)
 val empty_game : unit -> game_board
+
+(* creates a new player from a location list and the name type (comp or human) *)
+val newplayer : bytes -> (piece*location) list -> player
 
 (* Initializes game state from user input and computer generated setup *)
 val making_game : player -> player -> game_board

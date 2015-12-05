@@ -1,9 +1,15 @@
 (*Gamestate.ml*)
 
 type location = int * int
+
 and piece = {pce:string; id:int}
 
-and player = {name: bytes; pieces: (piece*location) list; graveyard: piece list; won: bool}
+and player = {name: bytes; pieces: (piece*location) list; graveyard: piece list;
+  won: bool}
+
+and game_board = (location*((piece*player) option)) list
+
+and gamestate = {gb: game_board ; human: player; comp: player; turn: player}
 
 (*get the rank of the piece during attack *)
 let get_rank (piece:piece) : int =
@@ -21,16 +27,6 @@ let get_rank (piece:piece) : int =
   | "Corporal" -> 4
   | _ -> failwith "not a piece. no rank"
 
-
-type game_board = (location*((piece*player) option)) list
-
-and gamestate = {gb: game_board ; human: player; comp: player; turn: player}
-
-(*
-Testing:
-let board = empty_game ();;
-print_game_board board;;
- *)
 let empty_game () : game_board =
   let newer = ref [] in
   for i=1 to 10 do
@@ -38,6 +34,9 @@ let empty_game () : game_board =
       newer := (!newer)@[((i,j), None)];
     done
   done; (!newer)
+
+let newplayer (name:bytes) (pieces: (piece*location) list) : player =
+  {name= name; pieces = pieces; graveyard = []; won = false}
 
 let making_game h c =
   let board = empty_game () in
@@ -55,13 +54,11 @@ let making_game h c =
   let new2 = newboard new1 h.pieces h in
   new2
 
-let add_human (board: game_board) (h: player) (loc: location) (p: piece): player =
+let add_human (board: game_board) (h: player) (c: player) (loc: location) (p: piece): game_board =
   let pieces = h.pieces in
   let newp = pieces@[(p,loc)] in
-  {name= h.name; pieces = newp; graveyard = h.graveyard; won=false}
-
-(* let add board h loc p c =
-   *)
+  let human = {name= h.name; pieces = newp; graveyard = h.graveyard; won=false} in
+  making_game human c
 
 
 (* Initializes game state from user input and computer generated setup *)
