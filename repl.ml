@@ -216,7 +216,7 @@ let new_game () =
 (*TODO: implement*)
 let quit gamestate =
   print_string "Now quitting the game :'( -- Play again soon!!\n\n"
-(*   let rec quitted (game: gamestate):unit = (
+   let rec quitted (game: gamestate) = (
     let prompt2 = print_string "\nAre you sure you would like to quit this game?\n\n-> " in
     let response2 =  String.lowercase(read_line prompt2) in
     if response2 = "no"
@@ -225,7 +225,7 @@ let quit gamestate =
       else (print_string "\nPlease answer the question."; quitted game)
     )
   in quitted gamestate
- *)
+
 
 (******************************PRINT FUNCTIONS*********************************)
 
@@ -258,7 +258,8 @@ let print_help () =
       [quit] quits the game
       [new] will begin a new game
       [place <piece> <location>] will place the piece (such as Spy1) at
-        location (formatted as '(row,column)') in the board
+        location (formatted as '(row,column)') in the board. You may only
+        place ONE piece at a time.
       [instructions] will print out the instructions on how to play the game
       [move piece location] will move the [piece] to the desired [location].
         - Pieces are named with the first 3 letters and its id
