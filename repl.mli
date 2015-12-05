@@ -14,6 +14,10 @@ type cmd =
   | Move of (piece*location)
   | Place of (piece*location)
   | Invalid
+  | Pieces
+  | Graveyard
+  | Board
+  | Instructions
 
 (* [prompt gamestate] prompts user for next move
  * - returns a tuple of the next direction and the amount of spaces to move
@@ -28,7 +32,7 @@ val print_game  : gamestate -> unit
 
 (* [print_help gamestate] prints the full help menu with all options.
  * contains all of the instructions and commands. a block of text*)
-val print_help  : bytes -> gamestate -> unit
+val print_help  : unit -> unit
 
 (* [process gamestate] processes the comand [cmd] and initiates the change.
 * Returns the updated gamestate. calls all of the gamestate functions. *)
