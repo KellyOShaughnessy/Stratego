@@ -13,7 +13,16 @@ type cmd =
 let prompt gamestate = failwith "unimplemented"
 
 let new_game () =
-  (* let comp = setup () in *)
+(*   let comp = setup () in
+  let rec build_human hum c =
+    if (List.length human.pieces = List.length comp.pieces)
+      then new_gamestate hum c
+    else (
+      let place = prompt (print_string "Please, place the next piece: ") in
+      match place with
+      |
+
+    ) *)
   failwith "unimplemented"
 
 let quit gamestate = failwith "unimplemented"
