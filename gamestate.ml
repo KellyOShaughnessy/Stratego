@@ -1,5 +1,7 @@
 (*Gamestate.ml*)
 
+(*TODO: reveal opponents piece when you attack it; change it on gameboard*)
+
 type location = int * int
 
 and piece = {pce:string; id:int}
@@ -86,8 +88,6 @@ let add_human (h: player) (c: player) (loc: location)
       human
     )
   else failwith "You cannot place a piece here"
-
-
 
 (* Initializes game state from user input and computer generated setup *)
 (* Testing:
@@ -364,8 +364,19 @@ let add_to_board game_board player piece location =
   in
   (new_gameboard, new_player_1)
 
+(*TODO: move needs to  return a gamestate option, not a bool*gamestate.
+This is because in REPL, the main function (process) needs to return a
+gamestate option. Look in REPL for more details.
+
+We will now need to update the 'turn' field in gamestate instead of having the
+bool as part of the return value.
+
+I commented out all of move and replaced it with "Some(gamestate) to remind us
+to do this and so that it would compile."
+*)
 let move gamestate player piece end_location =
-  let start_location = get_location player piece in
+  Some(gamestate)
+  (* let start_location = get_location player piece in
   let game_board = gamestate.gb in
   match validate_move game_board player piece end_location with
   | (true, Some opp_piece) ->
@@ -431,7 +442,7 @@ let move gamestate player piece end_location =
         (true,{gamestate with gb = added_gb; human = newer_player})
       else
         (true,{gamestate with gb = added_gb; comp = newer_player})
-  | (false, _) -> (false, gamestate)
+  | (false, _) -> (false, gamestate) *)
 
 
 let piece_to_string (piece:piece) =
