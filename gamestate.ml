@@ -39,6 +39,9 @@ let empty_game () : game_board =
   (* return list with all possible locations initiatlize to none *)
   (!newer)
 
+let playerwins player : player =
+  {player with won=true}
+
 let newplayer (name:bytes) (pieces: (piece*location) list) : player =
   (* making new player record from inputs *)
   {name= name; pieces = pieces; graveyard = []; won = false}
@@ -72,7 +75,7 @@ let making_game h c =
   (* returns the completed board *)
   new2
 
-let add_human (board: game_board) (h: player) (c: player) (loc: location)
+let add_human (h: player) (c: player) (loc: location)
   (p: piece): game_board =
   let pieces = h.pieces in
   let newp = pieces@[(p,loc)] in
@@ -87,8 +90,9 @@ let human = {name="human"; pieces = [(Spy 3, (7,3)); (Flag, (10,4))]; graveyard=
 in let comp = {name="comp"; pieces = [(Spy 3, (1,6)); (Flag, (1,10))]; graveyard=[]}
 in print_gamestate (new_game human comp);;
  *)
-let new_game (human:player) (comp:player) (board: game_board): gamestate =
+let new_gamestate (human:player) (comp:player): gamestate =
   if List.length human.pieces = List.length comp.pieces then (
+    let board = making_game human comp in
     {gb = board; human = human; comp = comp; turn = human}
   ) else failwith "It seems that you have not placed all of your pieces"
 

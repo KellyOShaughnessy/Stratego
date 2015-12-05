@@ -18,14 +18,19 @@ val get_rank : piece -> int
 (* creates a game_board with all locations initilized to None *)
 val empty_game : unit -> game_board
 
+(* Sets won of player to true *)
+val playerwins : player -> player
+
 (* creates a new player from a location list and the name type (comp or human) *)
 val newplayer : bytes -> (piece*location) list -> player
 
 (* Initializes game state from user input and computer generated setup *)
 val making_game : player -> player -> game_board
 
+val add_human: player -> player -> location -> piece -> game_board
+
 (* Initializes game state from user input and computer generated setup *)
-val new_game : player -> player -> game_board -> gamestate
+val new_gamestate : player -> player -> gamestate
 
 (* Uses player assocation pieces record to get the location of a piece *)
 val get_location : player -> piece -> location

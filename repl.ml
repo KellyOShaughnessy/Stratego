@@ -1,5 +1,5 @@
 open Gamestate
-
+open Ai
 
 (* Defining possible movement direction *)
 (* type dir = Up | Down | Left | Right *)
@@ -12,7 +12,9 @@ type cmd =
 
 let prompt gamestate = failwith "unimplemented"
 
-let new_game () = failwith "unimplemented"
+let new_game () =
+  (* let comp = setup () in *)
+  failwith "unimplemented"
 
 let quit gamestate = failwith "unimplemented"
 (*   let rec quitted (game: gamestate):unit = (
@@ -25,6 +27,7 @@ let quit gamestate = failwith "unimplemented"
     )
   in quitted gamestate
  *)
+
 let print_game gamestate =
   print_gamestate gamestate
 
@@ -116,3 +119,6 @@ let process gamestate cmd =
   | Help s -> print_help s gamestate; (false, gamestate)
   | Move (pce,loc) ->
       move gamestate gamestate.turn pce loc
+
+let () =
+  Printf.printf "\nWelcome to Stratego!\n\n"

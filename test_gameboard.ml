@@ -306,8 +306,17 @@ TEST "newcomplayer" = (newplayer "comp" computer_list) = computer
 (* Tests generating game board from two players *)
 TEST "building game_board" = (making_game hum computer) = game_board
 
+(* Testing adding a piece to the human list *)
+TEST "add_human" = (
+  let piece = {pce= "Spy"; id = 2} in
+  let newboard = add_human hum computer (3,1) piece in
+  List.assoc (3,1) newboard
+  ) = Some({pce= "Spy"; id = 2}, {hum with
+    pieces=hum.pieces@[({pce= "Spy"; id = 2},(3,1))]})
 
-TEST "add_human" = () =
+(* Testing new game state *)
+TEST "new_gamestate" = new_gamestate hum computer =
+  {gb= game_board; human = hum; comp = computer; turn=hum}
 
 (* Tests that Bomb and Flag cannot move *)
 TEST = (validate_move game_board hum b1 (2,5)) = (false,None)
