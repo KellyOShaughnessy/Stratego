@@ -26,10 +26,9 @@ let fix_input (inp:string) : string list =
   let regex = Str.regexp " +" in
   let ret_list = Str.split regex input_better in
   ret_list
-
-let rec parse () =
-  print_string "\n\nPlease type a command -->";
-  let input = fix_input (read_line()) in
+(*make sure this compiles with Sarah's and Nikitas and merge them all*)
+let rec parse inp =
+  let input = fix_input inp in
   let fst_cmd = List.nth input 0 in
   (* Extracting cmd type from input *)
   let cmd = match fst_cmd with
@@ -151,7 +150,12 @@ let print_help () =
         \n"
     | _ -> Printf.printf "Not a valid help command, please try again. \n" *)
 
-let process gamestate cmd =
+let process gamestate =
+  (*Getting user input*)
+  print_string "\n\nPlease type a command -->";
+  let input = read_line() in
+  let cmd = parse input in
+  (*Evaluating user command*)
   match cmd with
   | Quit -> (false, quit gamestate)
   | NewGame -> (true, new_game ())

@@ -19,10 +19,9 @@ type cmd =
   | Board
   | Instructions
 
-(* [prompt gamestate] prompts user for next move
- * - returns a tuple of the next direction and the amount of spaces to move
- * parses the input text and gives the command. *)
-val parse       : unit -> cmd
+(* [parse ()] prompts user for next command and parses the input and
+ * returns the appropriate command. *)
+val parse       : string -> cmd
 
 (* [quit gamestate] returns the final gamestate and quits the game *)
 val quit        : gamestate -> unit
@@ -36,7 +35,7 @@ val print_help  : unit -> unit
 
 (* [process gamestate] processes the comand [cmd] and initiates the change.
 * Returns the updated gamestate. calls all of the gamestate functions. *)
-val process     : gamestate -> cmd -> bool*gamestate
+val process     : gamestate -> bool*gamestate
 
 (* [new_game gamestate] returns a new, fresh gamestate/gameboard*)
 val new_game    : unit -> gamestate
