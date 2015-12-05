@@ -28,14 +28,19 @@ let get_rank (piece:piece) : int =
   | _ -> failwith "not a piece. no rank"
 
 let empty_game () : game_board =
+  (* creating a ref to an empty list *)
   let newer = ref [] in
-  for i=1 to 10 do
+  for i=10 downto 1 do
     for j=1 to 10 do
+    (* imperatively updating the list *)
       newer := (!newer)@[((i,j), None)];
     done
-  done; (!newer)
+  done;
+  (* return list with all possible locations initiatlize to none *)
+  (!newer)
 
 let newplayer (name:bytes) (pieces: (piece*location) list) : player =
+  (* making new player record from inputs *)
   {name= name; pieces = pieces; graveyard = []; won = false}
 
 let making_game h c =
@@ -43,9 +48,11 @@ let making_game h c =
   let rec newboard b pi pl = (
       match pi with
       | [] -> b
-      | (p,l)::t -> ( let n = List.map (fun (loc, op) -> (if (loc=l)
+      | (p,l)::t -> (
+        let n = List.map (fun (loc, op) -> (if (loc=l)
         then (if op = None then (loc, Some(p,pl))
-        else failwith "You are trying to place two pieces in the same location...")
+        else failwith "You are trying to place two pieces in the same
+          location...")
         else (loc,op))) b in
         newboard n t pl
       )
@@ -54,10 +61,12 @@ let making_game h c =
   let new2 = newboard new1 h.pieces h in
   new2
 
-let add_human (board: game_board) (h: player) (c: player) (loc: location) (p: piece): game_board =
+let add_human (board: game_board) (h: player) (c: player) (loc: location)
+  (p: piece): game_board =
   let pieces = h.pieces in
   let newp = pieces@[(p,loc)] in
-  let human = {name= h.name; pieces = newp; graveyard = h.graveyard; won=false} in
+  let human = {name= h.name; pieces = newp; graveyard = h.graveyard; won=false}
+  in
   making_game human c
 
 
