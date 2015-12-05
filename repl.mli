@@ -12,7 +12,7 @@ open Gamestate
 type cmd =
   | Quit
   | NewGame
-  | Help of bytes
+  | Help
   | Move of (piece*location)
 
 (* [prompt gamestate] prompts user for next move
@@ -25,7 +25,7 @@ val print_game  : gamestate -> unit
 
 (* [print_help gamestate] prints the full help menu with all options.
  * contains all of the instructions and commands. a block of text*)
-val print_help  : bytes -> gamestate -> unit
+val print_help  : unit -> unit
 
 (* [process gamestate] processes the comand [cmd] and initiates the change.
 * Returns the updated gamestate. calls all of the gamestate functions. *)
