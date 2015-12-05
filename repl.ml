@@ -114,3 +114,6 @@ let process gamestate cmd =
   | Help -> print_help(); (false, gamestate)
   | Move (pce,loc) ->
       move gamestate gamestate.turn pce loc
+  | Instructions -> print_instructions
+  | Place(pce,loc) -> failwith "unimplemented"
+  | Graveyard -> print_grave_list gamestate.human
