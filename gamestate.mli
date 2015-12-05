@@ -10,8 +10,7 @@ and player = {name: bytes; pieces : (piece*location) list;
   Some(piece, player) if the position currently holds a piece *)
 and game_board = (location*((piece*player) option)) list
 
-and gamestate = {gb : game_board ; human : player;
-                  comp : player; turn: player}
+and gamestate = {gb : game_board ; human : player; comp : player; turn: player}
 
 (*get the rank of the piece during attack *)
 val get_rank : piece -> int
@@ -19,14 +18,19 @@ val get_rank : piece -> int
 (* creates a game_board with all locations initilized to None *)
 val empty_game : unit -> game_board
 
+(* Sets won of player to true *)
+val playerwins : player -> player
+
 (* creates a new player from a location list and the name type (comp or human) *)
 val newplayer : bytes -> (piece*location) list -> player
 
 (* Initializes game state from user input and computer generated setup *)
 val making_game : player -> player -> game_board
 
+val add_human: player -> player -> location -> piece -> player
+
 (* Initializes game state from user input and computer generated setup *)
-val new_game : player -> player -> game_board -> gamestate
+val new_gamestate : player -> player -> gamestate
 
 (* Uses player assocation pieces record to get the location of a piece *)
 val get_location : player -> piece -> location
@@ -45,9 +49,11 @@ val validate_move : game_board -> player -> piece -> location ->
 * remain on the game board *)
 val attack : piece -> piece -> player -> player -> ((piece*player) option)
 
-val remove_from_board : game_board -> player -> piece -> location -> game_board*player
+val remove_from_board : game_board -> player -> piece -> location ->
+  game_board*player
 
-val add_to_board : game_board -> player -> piece -> location -> game_board*player
+val add_to_board : game_board -> player -> piece -> location ->
+  game_board*player
 
 (* returns a new gamestate with updated piece locations
 * - [gamestate] is the current gamestate to be updated
@@ -62,7 +68,7 @@ val add_to_board : game_board -> player -> piece -> location -> game_board*playe
 *   calls attack function and updates board
 * If validate_move returns false,
 *   asks player to try a different move *)
-val move : gamestate -> player -> piece -> location -> (bool*gamestate)
+val move : gamestate -> player -> piece -> location -> gamestate option
 
 (* [print_game_board game_board] Prints the current game_board *)
 val print_game_board : game_board -> unit
@@ -70,7 +76,8 @@ val print_game_board : game_board -> unit
 (* [piece_to_string piece] Converts the [piece] to the string representation *)
 val piece_to_string : piece -> bytes
 
-(* [piecelst_to_string piece] Converts a [piece list] to the string representation *)
+(* [piecelst_to_string piece] Converts a [piece list] to the string
+   representation *)
 val piecelst_to_string: piece list -> bytes
 
 (* [print_gamestate gamestate]  *)

@@ -65,6 +65,7 @@ let computer_list =
   (ser2,(10,9));
   (sc3,(10,10))]
 
+
 let hum = {name= "human"; pieces = human_list; graveyard=[]; won=false}
 let computer = {name= "comp"; pieces = computer_list; graveyard=[]; won=false}
 
@@ -82,7 +83,7 @@ let game_board =
 ((10,10),Some (sc3, computer));
 
 ((9,1),Some (sp1,computer));
-((9,2),Some (sc3,computer));
+((9,2),Some (sc1,computer));
 ((9,3),Some (cap1,computer));
 ((9,4),Some (maj1,computer));
 ((9,5),Some (f1,computer));
@@ -181,9 +182,141 @@ let game_board =
 ((1,10),Some (cap2,hum));
 ]
 
+let empty_game_board =
+[
+((10,1),None);
+((10,2),None);
+((10,3),None);
+((10,4),None);
+((10,5),None);
+((10,6),None);
+((10,7),None);
+((10,8),None);
+((10,9),None);
+((10,10),None);
+
+((9,1), None);
+((9,2),None);
+((9,3),None);
+((9,4),None);
+((9,5),None);
+((9,6),None);
+((9,7),None);
+((9,8),None);
+((9,9),None);
+((9,10),None);
+
+((8,1),None);
+((8,2),None);
+((8,3),None);
+((8,4),None);
+((8,5),None);
+((8,6),None);
+((8,7),None);
+((8,8),None);
+((8,9),None);
+((8,10),None);
+
+((7,1),None);
+((7,2),None);
+((7,3),None);
+((7,4),None);
+((7,5),None);
+((7,6),None);
+((7,7),None);
+((7,8),None);
+((7,9),None);
+((7,10),None);
+
+((6,1),None);
+((6,2),None);
+((6,3),None);
+((6,4),None);
+((6,5),None);
+((6,6),None);
+((6,7),None);
+((6,8),None);
+((6,9),None);
+((6,10),None);
+
+((5,1),None);
+((5,2),None);
+((5,3),None);
+((5,4),None);
+((5,5),None);
+((5,6),None);
+((5,7),None);
+((5,8),None);
+((5,9),None);
+((5,10),None);
+
+((4,1),None);
+((4,2),None);
+((4,3),None);
+((4,4),None);
+((4,5),None);
+((4,6),None);
+((4,7),None);
+((4,8),None);
+((4,9),None);
+((4,10),None);
+
+((3,1),None);
+((3,2),None);
+((3,3),None);
+((3,4),None);
+((3,5),None);
+((3,6),None);
+((3,7),None);
+((3,8),None);
+((3,9),None);
+((3,10),None);
+
+((2,1),None);
+((2,2),None);
+((2,3),None);
+((2,4),None);
+((2,5),None);
+((2,6),None);
+((2,7),None);
+((2,8),None);
+((2,9),None);
+((2,10),None);
+
+((1,1),None);
+((1,2),None);
+((1,3),None);
+((1,4),None);
+((1,5),None);
+((1,6),None);
+((1,7),None);
+((1,8), None);
+((1,9),None);
+((1,10),None);
+]
 (* -------------------------TESTING VALIDATE_MOVE---------------------------- *)
 (*TODO CANNOT COMPLETE TESTING UNTIL GET LOCATION IS DONE*)
-TEST "newplayer" = (newplayer "human" human_list) = hum
+
+(* Test completely empty game *)
+TEST "empty_game" = empty_game () = empty_game_board
+
+(* Test newplayer from (piece*option) list *)
+TEST "newhumanplayer" = (newplayer "human" human_list) = hum
+TEST "newcomplayer" = (newplayer "comp" computer_list) = computer
+
+(* Tests generating game board from two players *)
+TEST "building game_board" = (making_game hum computer) = game_board
+
+(* Testing adding a piece to the human list *)
+TEST "add_human" = (
+  let piece = {pce= "Spy"; id = 2} in
+  let newhuman = add_human (newplayer "human" []) computer (2,1) piece in
+  List.assoc (2,1) (making_game newhuman computer)
+  ) = Some({pce= "Spy"; id = 2}, (newplayer "human" [({pce= "Spy"; id = 2},(2,1))]))
+
+(* Testing new game state *)
+TEST "new_gamestate" = new_gamestate hum computer =
+  {gb= game_board; human = hum; comp = computer; turn=hum}
 
 (* Tests that Bomb and Flag cannot move *)
 TEST = (validate_move game_board hum b1 (2,5)) = (false,None)

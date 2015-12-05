@@ -1,5 +1,7 @@
 (*Gamestate.ml*)
 
+(*TODO: reveal opponents piece when you attack it; change it on gameboard*)
+
 type location = int * int
 
 and piece = {pce:string; id:int}
@@ -28,38 +30,64 @@ let get_rank (piece:piece) : int =
   | _ -> failwith "not a piece. no rank"
 
 let empty_game () : game_board =
+  (* creating a ref to an empty list *)
   let newer = ref [] in
-  for i=1 to 10 do
+  for i=10 downto 1 do
     for j=1 to 10 do
+    (* imperatively updating the list *)
       newer := (!newer)@[((i,j), None)];
     done
-  done; (!newer)
+  done;
+  (* return list with all possible locations initiatlize to none *)
+  (!newer)
+
+let playerwins player : player =
+  {player with won=true}
 
 let newplayer (name:bytes) (pieces: (piece*location) list) : player =
+  (* making new player record from inputs *)
   {name= name; pieces = pieces; graveyard = []; won = false}
 
 let making_game h c =
+  (* creating a new empty board_game *)
   let board = empty_game () in
+  (* helper function to loop through each player's pieces and add them to the
+  game_board *)
   let rec newboard b pi pl = (
+    (* iterates over the board *)
       match pi with
       | [] -> b
-      | (p,l)::t -> ( let n = List.map (fun (loc, op) -> (if (loc=l)
+      | (p,l)::t -> (
+        (* map function that checks if location in piece list is the same as l
+           and adds the loc*player option to the pair if the current value is
+           None. If not None, throws a warning.
+         *)
+        let n = List.map (fun (loc, op) -> (if (loc=l)
         then (if op = None then (loc, Some(p,pl))
-        else failwith "You are trying to place two pieces in the same location...")
+        else failwith "You are trying to place two pieces in the same
+          location...")
         else (loc,op))) b in
         newboard n t pl
       )
     ) in
+  (* Adds the computer's pieces *)
   let new1 = newboard board c.pieces c in
+  (* Adds the human's pieces *)
   let new2 = newboard new1 h.pieces h in
+  (* returns the completed board *)
   new2
 
-let add_human (board: game_board) (h: player) (c: player) (loc: location) (p: piece): game_board =
+let add_human (h: player) (c: player) (loc: location)
+  (p: piece): player =
   let pieces = h.pieces in
-  let newp = pieces@[(p,loc)] in
-  let human = {name= h.name; pieces = newp; graveyard = h.graveyard; won=false} in
-  making_game human c
-
+  if ((fst loc) <= 2 && (fst loc) > 0 && (snd loc) <= 10 && (fst loc) > 0)
+    then (
+      let newp = pieces@[(p,loc)] in
+      let human = {name= h.name; pieces = newp; graveyard = h.graveyard; won=false}
+      in
+      human
+    )
+  else failwith "You cannot place a piece here"
 
 (* Initializes game state from user input and computer generated setup *)
 (* Testing:
@@ -67,13 +95,14 @@ let human = {name="human"; pieces = [(Spy 3, (7,3)); (Flag, (10,4))]; graveyard=
 in let comp = {name="comp"; pieces = [(Spy 3, (1,6)); (Flag, (1,10))]; graveyard=[]}
 in print_gamestate (new_game human comp);;
  *)
-let new_game (human:player) (comp:player) (board: game_board): gamestate =
+let new_gamestate (human:player) (comp:player): gamestate =
   if List.length human.pieces = List.length comp.pieces then (
+    let board = making_game human comp in
     {gb = board; human = human; comp = comp; turn = human}
   ) else failwith "It seems that you have not placed all of your pieces"
 
 (* Uses player assocation pieces record to get the location of a piece
-get location. try with, and check if that piece is in the player's piece to chekc
+get location. try with, and check if that piece is in the player's piece to check
 if my piece is actually on the board.*)
 
 let get_location  (pl: player)  (pc: piece) : location  =
@@ -88,13 +117,13 @@ let get_location  (pl: player)  (pc: piece) : location  =
 
 (*Checks that piece isn't trying to move off of gameboard*)
 let on_gameboard (dest:location) : bool =
-  if ((fst dest) <= 10 && (fst dest) >0 && (snd dest) <=10 && (snd dest) >0) then true
+  if ((fst dest) <= 10 && (fst dest) >0 && (snd dest) <=10 && (snd dest) >0)
+  then true
   else false
 
 (*validates that the piece can move to the specified destination*)
 let simple_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) : bool =
   let loc = get_location pl pc in
-  (*TODO need to take absolute value*)
   let xdist = fst dest - fst loc in
   let ydist = snd dest - snd loc in
   (*Check that only trying to move one space*)
@@ -130,9 +159,9 @@ let rec check_intermediate (gb:game_board) (pl:player) (dir:string) (loc:locatio
      if y=pl then false
      else check_intermediate gb pl dir new_loc dest
 
-let captain_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) : bool =
+let captain_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) :
+  bool =
   let loc = get_location pl pc in
-  (*TODO need to take absolute value?*)
   let xdist = fst dest - fst loc in
   let axd = abs xdist in
   let ydist = snd dest - snd loc in
@@ -155,8 +184,9 @@ let captain_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) : bo
 
 let scout_validate (pl:player) (pc:piece) (dest:location) (gb:game_board) : bool =
   let loc = get_location pl pc in
-(*   Printf.printf "loc: (%d,%d) dest: (%d,%d)\n" (fst loc) (snd loc) (fst dest) (snd dest);
- *)  (*TODO need to take absolute value*)
+(*   Printf.printf "loc: (%d,%d) dest: (%d,%d)\n" (fst loc) (snd loc) (fst dest)
+    (snd dest);
+ *)
   let xdist = fst dest - fst loc in
   let ydist = snd dest - snd loc in
   (*Check that only trying to move in one direction that is contained on board*)
@@ -193,7 +223,8 @@ let validate_move gb pl pc dest =
     let loc = get_location pl pc in
     if  loc = dest then (true, Some(pc)) else
     match pc.pce with
-    (*All pieces can move one space in any direction unless otherwise specified.*)
+    (*All pieces can move one space in any direction unless otherwise
+    specified.*)
     | "Flag" -> (false,None)
     | "Bomb" -> (false,None)
     | "Spy" ->
@@ -306,12 +337,14 @@ let rec remove_from_graveyard piece lst =
 let rec remove_from_pieces piece lst =
   match lst with
   | [] -> []
-  | (pce,loc)::t -> if pce=piece then t else (pce,loc)::remove_from_pieces piece t
+  | (pce,loc)::t -> if pce=piece then t else (pce,loc)::remove_from_pieces
+    piece t
 
 let add_to_board game_board player piece location =
   let new_graveyard = remove_from_graveyard piece player.graveyard in
   let new_player_pieces = (piece,location)::player.pieces in
-  let new_player_1 = {player with pieces=new_player_pieces; graveyard=new_graveyard} in
+  let new_player_1 = {player with pieces=new_player_pieces; graveyard=
+  new_graveyard} in
   let new_gameboard =
     (List.map
       (fun ((row,col),some_piece) ->
@@ -331,12 +364,24 @@ let add_to_board game_board player piece location =
   in
   (new_gameboard, new_player_1)
 
+(*TODO: move needs to  return a gamestate option, not a bool*gamestate.
+This is because in REPL, the main function (process) needs to return a
+gamestate option. Look in REPL for more details.
+
+We will now need to update the 'turn' field in gamestate instead of having the
+bool as part of the return value.
+
+I commented out all of move and replaced it with "Some(gamestate) to remind us
+to do this and so that it would compile."
+*)
 let move gamestate player piece end_location =
-  let start_location = get_location player piece in
+  Some(gamestate)
+  (* let start_location = get_location player piece in
   let game_board = gamestate.gb in
   match validate_move game_board player piece end_location with
   | (true, Some opp_piece) ->
-    let opp_player = (if player.name ="human" then gamestate.comp else gamestate.human) in
+    let opp_player = (if player.name ="human" then gamestate.comp else
+    gamestate.human) in
       (match attack piece opp_piece player opp_player with
       | None ->
           let (removed_start_gb, new_player) = remove_from_board game_board
@@ -361,23 +406,30 @@ let move gamestate player piece end_location =
                                                 new_player pce
                                                 end_location in
             let new_opp_graveyard = opp_piece::gamestate.comp.graveyard in
-            let new_opp_pieces = remove_from_pieces opp_piece gamestate.comp.pieces in
-            let new_opp = {gamestate.comp with pieces=new_opp_pieces; graveyard = new_opp_graveyard} in
+            let new_opp_pieces = remove_from_pieces opp_piece
+              gamestate.comp.pieces in
+            let new_opp = {gamestate.comp with pieces=new_opp_pieces; graveyard
+               = new_opp_graveyard} in
             if new_player.name = "human" then
-              (true,{gamestate with human = newer_player; comp = new_opp; gb=add_end_gb})
+              (true,{gamestate with human = newer_player; comp = new_opp;
+                gb=add_end_gb})
             else
-              (true,{gamestate with comp = newer_player; human = new_opp; gb=add_end_gb})
+              (true,{gamestate with comp = newer_player; human = new_opp;
+                gb=add_end_gb})
           else
               let (add_end_gb, opp_player) = add_to_board removed_start_gb
                                                   gamestate.comp pce
                                                   end_location in
               let new_pl_graveyard = piece::new_player.graveyard in
               let new_pl_pieces = remove_from_pieces piece new_player.pieces in
-              let new_pl = {new_player with pieces=new_pl_pieces; graveyard = new_pl_graveyard} in
+              let new_pl = {new_player with pieces=new_pl_pieces; graveyard =
+                new_pl_graveyard} in
               if new_player.name = "human" then
-                (true,{gamestate with human = new_pl; comp=opp_player; gb=add_end_gb})
+                (true,{gamestate with human = new_pl; comp=opp_player;
+                  gb=add_end_gb})
               else
-                (true,{gamestate with comp = new_pl; human=opp_player; gb=add_end_gb})
+                (true,{gamestate with comp = new_pl; human=opp_player;
+                  gb=add_end_gb})
       )
   | (true, None) ->
       let (removed_gb,new_player) = remove_from_board game_board player
@@ -390,7 +442,7 @@ let move gamestate player piece end_location =
         (true,{gamestate with gb = added_gb; human = newer_player})
       else
         (true,{gamestate with gb = added_gb; comp = newer_player})
-  | (false, _) -> (false, gamestate)
+  | (false, _) -> (false, gamestate) *)
 
 
 let piece_to_string (piece:piece) =
