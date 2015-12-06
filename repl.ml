@@ -88,8 +88,10 @@ let extract_location (inp:string list) : int*int =
            (try int_of_string (String.sub loc_str 1 (comma-1))
             with | Failure x -> -1 | Not_found -> -1) in
           let after_com  =
-           (try int_of_string (String.sub loc_str comma (last - comma +1))
+           (try int_of_string (String.sub loc_str (comma+1) (last - comma -1))
             with | Failure x -> -1 | Not_found -> -1) in
+           Printf.printf "\nafter_com -> %d, %d" comma (last - comma);
+           Printf.printf "\nLoc -> (%d,%d)\n" before_com after_com ;
           (before_com,after_com)
         else
           (-1,-1)
@@ -137,7 +139,9 @@ let rec parse inp =
         match pce,loc with
         | _,(-1,-1) -> Invalid
         | None,_    -> Invalid
-        | Some p,_  -> Place((p,loc)) )
+        | Some p,(-1,_)  -> Invalid
+        | Some p,(_,-1)  -> Invalid
+        | Some p,_       -> Place((p,loc)) )
     else
       Invalid
     )
@@ -206,7 +210,7 @@ let new_game () =
         )
       )
       | _ -> print_string "\n\nThis is not valid syntax for placing your pieces.
-                            Please try placing a piece.\n";
+        Please try placing a piece.\n";
         build_human hum c pieces
     )
   ) in
