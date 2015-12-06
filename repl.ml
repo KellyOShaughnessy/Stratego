@@ -398,7 +398,9 @@ and process gamestate ai_move =
     if name = "comp"
       then
         (match next_move gamestate [] ai_move [] with
-        | None -> failwith "unimplemented, computer has lost has no more moves"
+        | None ->
+          print_string "YOU WON!!! The computer has no more moves! \n";
+          NewGame
         | Some(piece,loc) -> Move(piece,loc))
     else (
       let _ = (match gamestate with | None -> () | Some g -> print_gamestate g) in

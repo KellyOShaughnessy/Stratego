@@ -245,6 +245,9 @@ let validate_move gb pl pc dest =
     | "Colonel" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
+    | "Corporal" ->
+      if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
+      else (false, None)
     | "Major" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
