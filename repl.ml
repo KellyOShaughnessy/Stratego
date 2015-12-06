@@ -214,17 +214,8 @@ let new_game () =
   build_human empty_hum comp piece_list
 
 (*TODO: implement*)
-let quit gamestate =
-  print_string "Now quitting the game :'( -- Play again soon!!\n\n"
-   let rec quitted (game: gamestate):unit = (
-    let prompt2 = print_string "\nAre you sure you would like to quit this game?\n\n-> " in
-    let response2 =  String.lowercase(read_line prompt2) in
-    if response2 = "no"
-      then (print_string "\nOK.\n\n"; process game)
-      else if response2 = "yes" then Printf.printf "\nOK.\n\n";
-      else (print_string "\nPlease answer the question."; quitted game)
-    )
-  in quitted gamestate
+
+
 
 
 (******************************PRINT FUNCTIONS*********************************)
@@ -258,16 +249,9 @@ let print_help () =
 
       [help] displays this menu again
       [quit] quits the game
-<<<<<<< HEAD
-      [new game] will begin a new game
-      [place] will place your pieces on the board. Place piece location. \n
-              Once your pieces have been placed on the gamebaord, do not use \n
-              the place command again.
-=======
       [new] will begin a new game
       [place <piece> <location>] will place the piece (such as Spy1) at
         location (formatted as '(row,column)') in the board
->>>>>>> 396b3f0b9df2d067dcccac50cc936f2e893160f1
       [instructions] will print out the instructions on how to play the game
       [move piece location] will move the [piece] to the desired [location].
         - Pieces are named with the first 3 letters and its id
@@ -353,7 +337,7 @@ let rec process gamestate =
   print_string "Type a command --> ";
   let cmd = parse (read_line()) in
   match cmd with
-  | Quit -> (quit gamestate)
+  | Quit -> (quit_game gamestate)
   | NewGame -> (
       let g = new_game () in
       print_game g;
@@ -417,6 +401,17 @@ let rec process gamestate =
       print_retry ();
       process gamestate
     )
+
+and quit_game (game: gamestate option) =
+    print_string "\nAre you sure you would like to quit this game? Type yes or no. \n\n-> ";
+    let prompt2 = read_line () in
+    let response2 =  String.lowercase(prompt2) in
+    if response2 = "no"
+      then (print_string "\nOK.\n\n"; process (Some game))
+      else if response2 = "yes" then Printf.printf "\nGoodbuy.\n\n"
+      else (print_string "\nPlease answer yes or no."; quit_game (Some game))
+    in quit_game (Some game)
+
 
 (*Main function that begins gameplay prompting*)
 (*NOTE: I think main function needs to be all units; can't return gamestate*)
