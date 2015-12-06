@@ -50,9 +50,10 @@ let fix_input (inp:string) : string list =
   ret_list
 
 let print_retry () =
-  print_string "This is an invalid move command, please try again.\n
-                      To see a list of commands, type \"help\".\n\n
-                      Please type a command --> "
+  print_string "------------------------------------------------------------------------";
+  print_string "\nThis is an invalid command, please try again.\n"
+(*   To see a list of commands, type \"help\".
+  Please type a command --> " *)
 
 let extract_piece (pc:string) : piece option=
   let pce_lst = [
@@ -203,7 +204,7 @@ let new_game () =
     if (List.length hum.pieces = List.length comp.pieces && pieces = [])
       then (new_gamestate hum comp)
     else (
-      print_string ("\n\nPlease place these pieces on the board: "^
+      print_string ("\nPlease place these pieces on the board: "^
         (piecelst_to_string pieces));
       Printf.printf "\n\nWhere would you like to place your next piece?
       Format: 'place <piece> <location>'
@@ -241,7 +242,9 @@ let new_game () =
         )
       )
       | Quit -> print_string "\nOk. Goodbuy!\n\n"; exit 0
-      | _ -> print_string "\n\nThis is not valid syntax for placing your pieces.
+      | _ ->
+        print_string "--------------------------------------------------------------------";
+        print_string "\nThis is not valid syntax for placing your pieces.
         Please try placing a piece.\n";
         build_human hum pieces
     )
@@ -398,7 +401,7 @@ and process gamestate ai_move =
     if name = "comp"
       then
         (match next_move gamestate [] ai_move [] with
-        | None -> failwith "unimplemented, computer has lost has no mroe moves"
+        | None -> failwith "unimplemented, computer has lost has no more moves"
         | Some(piece,loc) -> Move(piece,loc))
     else (
       print_string "To see list of commands, type 'help'\nType a command --> ";
