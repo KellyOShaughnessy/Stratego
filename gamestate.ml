@@ -449,7 +449,7 @@ let move gamestate player piece end_location =
           in
           Some new_gs
       | Some (pce,plyr) ->
-          Printf.printf "What a battle! %s won, %s stays!" plyr.name pce.pce;
+          Printf.printf "What a battle! %s won, %s stays!\n" plyr.name pce.pce;
 
           (* Attacking player 'wins' the attack *)
           if player.name = plyr.name then
