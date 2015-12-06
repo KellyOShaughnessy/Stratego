@@ -350,6 +350,92 @@ let add_to_board game_board player piece location =
   in
   (new_gameboard, new_player_1)
 
+(*
+We will now need to update the 'turn' field in gamestate instead of having the
+bool as part of the return value.
+*)
+let move gamestate player piece end_location =
+  let start_location = get_location player piece in
+  let game_board = gamestate.gb in
+  match validate_move game_board player piece end_location with
+  | (true, Some opp_piece) ->
+    Printf.printf "Oohh! an attack! %s vs. %s \n" piece.pce opp_piece.pce;
+    let opp_player =
+      (if player.name ="human" then
+        gamestate.comp
+      else
+      gamestate.human)
+    in
+      (match attack piece opp_piece player opp_player with
+      | None ->
+          Printf.printf "Wow, you both lost! \n";
+          let (removed_start_gb, new_player) = remove_from_board game_board
+                                                player piece start_location in
+          let (removed_end_gb, new_opp_player) = remove_from_board
+                                                removed_start_gb opp_player
+                                                opp_piece end_location in
+          let changed_gs = {gamestate with gb = removed_end_gb} in
+          let new_gs =
+            (if player.name = "human" then
+              {changed_gs with human = new_player; comp = new_opp_player;
+              turn = new_opp_player}
+            else
+              {changed_gs with human = new_opp_player; comp = new_player;
+              turn = new_opp_player})
+          in
+          Some new_gs
+      | Some (pce,plyr) ->
+          Printf.printf "What a battle! %s won, %s stays!" plyr.name pce.pce;
+
+          (* Attacking player 'wins' the attack *)
+          if player.name = plyr.name then
+            let (removed_start_gb, new_player) = remove_from_board game_board
+                                                plyr piece start_location in
+            let (add_end_gb, newer_player) = add_to_board removed_start_gb
+                                                new_player pce
+                                                end_location in
+            let new_opp_graveyard = opp_piece::gamestate.comp.graveyard in
+            let new_opp_pieces = remove_from_pieces opp_piece
+              gamestate.comp.pieces in
+            let new_opp = {gamestate.comp with pieces=new_opp_pieces; graveyard
+               = new_opp_graveyard} in
+            if new_player.name = "human" then
+              Some {human = newer_player; comp = new_opp;
+                gb=add_end_gb; turn=new_opp}
+            else
+              Some {comp = newer_player; human = new_opp;
+                gb=add_end_gb; turn=new_opp}
+          else
+              let (removed_start_gb, new_player) = remove_from_board game_board
+                                                player piece start_location in
+              let (add_end_gb, opp_player) = add_to_board removed_start_gb
+                                                  plyr pce
+                                                  end_location in
+              let new_pl_graveyard = piece::new_player.graveyard in
+              let new_pl_pieces = remove_from_pieces piece new_player.pieces in
+              let new_pl = {new_player with pieces=new_pl_pieces; graveyard =
+                new_pl_graveyard} in
+              if new_player.name = "human" then
+                Some {human = new_pl; comp=opp_player;
+                  gb=add_end_gb; turn=opp_player}
+              else
+                Some {comp = new_pl; human=opp_player;
+                  gb=add_end_gb; turn=opp_player}
+      )
+  | (true, None) ->
+      let (removed_gb,new_player) = remove_from_board game_board player
+                                      piece start_location
+      in
+      let (added_gb,newer_player) = add_to_board removed_gb new_player
+                                      piece end_location
+      in
+      if player.name="human" then
+        Some {gamestate with gb = added_gb; human = newer_player;
+              turn = gamestate.comp}
+      else
+        Some {gamestate with gb = added_gb; comp = newer_player;
+            turn = gamestate.human}
+  | (false, _) -> Printf.printf "Sneaky, but you can't move here\n"; None
 
 
 
@@ -417,82 +503,17 @@ let rec print_game_board (game_board:game_board)=
     Printf.printf "%s" s3;
     print_game_board t
 
-(*
-We will now need to update the 'turn' field in gamestate instead of having the
-bool as part of the return value.
-*)
-let move gamestate player piece end_location =
-  let start_location = get_location player piece in
-  let game_board = gamestate.gb in
-  match validate_move game_board player piece end_location with
-  | (true, Some opp_piece) ->
-    let opp_player = (if player.name ="human" then gamestate.comp else
-    gamestate.human) in
-      (match attack piece opp_piece player opp_player with
-      | None ->
-          let (removed_start_gb, new_player) = remove_from_board game_board
-                                                player piece start_location in
-          let (removed_end_gb, new_opp_player) = remove_from_board
-                                                removed_start_gb opp_player
-                                                opp_piece end_location in
-          let changed_gs = {gamestate with gb = removed_end_gb} in
-          let new_gs =
-            (if player.name = "human" then
-              {changed_gs with human = new_player; comp = new_opp_player;
-              turn = new_opp_player}
-            else
-              {changed_gs with human = new_opp_player; comp = new_player;
-              turn = new_opp_player})
-          in
-          Some new_gs
-      | Some (pce,plyr) ->
-          let (removed_start_gb, new_player) = remove_from_board game_board
-                                                player piece start_location in
-          (* Attacking player 'wins' the attack *)
-          if new_player.name = plyr.name then
-            let (add_end_gb, newer_player) = add_to_board removed_start_gb
-                                                new_player pce
-                                                end_location in
-            let new_opp_graveyard = opp_piece::gamestate.comp.graveyard in
-            let new_opp_pieces = remove_from_pieces opp_piece
-              gamestate.comp.pieces in
-            let new_opp = {gamestate.comp with pieces=new_opp_pieces; graveyard
-               = new_opp_graveyard} in
-            if new_player.name = "human" then
-              Some {human = newer_player; comp = new_opp;
-                gb=add_end_gb; turn=new_opp}
-            else
-              Some {comp = newer_player; human = new_opp;
-                gb=add_end_gb; turn=new_opp}
-          else
-              let (add_end_gb, opp_player) = add_to_board removed_start_gb
-                                                  gamestate.comp pce
-                                                  end_location in
-              let new_pl_graveyard = piece::new_player.graveyard in
-              let new_pl_pieces = remove_from_pieces piece new_player.pieces in
-              let new_pl = {new_player with pieces=new_pl_pieces; graveyard =
-                new_pl_graveyard} in
-              if new_player.name = "human" then
-                Some {human = new_pl; comp=opp_player;
-                  gb=add_end_gb; turn=opp_player}
-              else
-                Some {comp = new_pl; human=opp_player;
-                  gb=add_end_gb; turn=opp_player}
-      )
-  | (true, None) ->
-      let (removed_gb,new_player) = remove_from_board game_board player
-                                      piece start_location
-      in
-      let (added_gb,newer_player) = add_to_board removed_gb new_player
-                                      piece end_location
-      in
-      if player.name="human" then
-        Some {gamestate with gb = added_gb; human = newer_player;
-              turn = gamestate.comp}
-      else
-        Some {gamestate with gb = added_gb; comp = newer_player;
-            turn = gamestate.human}
-  | (false, _) -> None
+(* Displays the computer's pieces as well *)
+let debug_print_gameboard gamestate =
+  let new_gb =
+    (List.map
+      (fun (loc, opt) ->
+        (match opt with
+        | None -> (loc, None)
+        | Some (piece,player) -> (loc, Some(piece,gamestate.human)))
+    )
+    gamestate.gb) in
+  print_game_board new_gb
 
 
 let print_gamestate (gamestate:gamestate) =
@@ -507,14 +528,3 @@ let print_gamestate (gamestate:gamestate) =
   in
   Printf.printf "     Turn: %s\n\n" t
 
-(* Displays the computer's pieces as well *)
-let debug_print_gameboard gamestate =
-  let new_gb =
-    (List.map
-      (fun (loc, opt) ->
-        (match opt with
-        | None -> (loc, None)
-        | Some (piece,player) -> (loc, Some(piece,gamestate.human)))
-    )
-    gamestate.gb) in
-  print_game_board new_gb
