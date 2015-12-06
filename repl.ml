@@ -324,22 +324,29 @@ let print_intro () : unit =
   if you just aren't up for the challenge right now.\n"
 
 (*TODO: Print function for when a player wins. Add in restart capabilities*)
-(* let check_for_win gamestate : bool =
-  match gamestate with
-  | None -> false
-  | Some x -> (
-      if x.turn.won = true
-      then true (print_game x; win ())
-  print_string "
-    \n\n~~~~~~~~~~~~~~~~~~~~~~~~~WINNER!!!!!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n" *)
+let rec check_for_win new_gs  =
+  match new_gs with
+  | None -> process None
+  | Some gs ->
+    (if gs.human.won then
+      (print_string "ALLSTAR!! YOU HAVE CAPTURED THE FLAG! YOU WIN! ";
+      print_string "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ";
+      print_string "Play again? ";
+      process None)
+    else if gs.comp.won then
+      (print_string "The computer beat you! AI's are taking over ";
+      print_string "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  ";
+      print_string "You can do better than that, try again? ";
+      process None)
+    else
+      process new_gs)
 
 (****************************GAME PLAY REPL*************************************)
 
-(*TODO: I took out bool in the (bool*gamestate) tuple so need to actually change
- the "turn" field in gamestate at each stage for whose turn it is *)
+
 (*TODO: process needs to return a unit because this is the main repl function.
 This might conflict with how the 'move' function returns a gamestate option.*)
-let rec process gamestate =
+and process gamestate =
   (*TODO: check if 'won' is true*)
   print_string "Type a command --> ";
   let cmd = parse (read_line()) in
@@ -356,12 +363,13 @@ let rec process gamestate =
     )
   | Move (pce,loc) -> (
       match gamestate with
-      | None -> (
-          print_string "You must start the game before you can move your pieces!\n";
+      | None ->
+          (print_string "You must start the game before you can move your pieces!\n";
           print_intro ();
           process None)
-      | Some g -> (
-        process (move g g.turn pce loc) )
+      | Some g ->
+          (let new_gs = move g g.turn pce loc in
+          check_for_win new_gs)
     )
   | Place (p,l) -> (
       match gamestate with
