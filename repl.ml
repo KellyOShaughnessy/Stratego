@@ -283,6 +283,8 @@ let print_help () =
       are commands to help you understand the game and remind you of the
       current state of the game:
 
+      [quickstart] will randomly fill the board with your pieces. Convenient to
+      begin the game as soon as possible.
       [help] displays this menu again
       [quit] quits the game
       [new] will begin a new game
