@@ -416,7 +416,7 @@ and process gamestate ai_move =
       | None ->
           (print_string "You must start the game before you can move your pieces!\n";
           print_intro ();
-          process None ai_move)
+          process gamestate ai_move)
       | Some g ->
           (let new_gs = move g g.turn pce loc in
           match new_gs with
@@ -425,7 +425,9 @@ and process gamestate ai_move =
     )
   | Place (p,l) -> (
       match gamestate with
-      | None -> print_string "Initialization failed. Please quit and try again."
+      | None -> (
+        print_string "You must type 'newgame' before placing pieces.";
+        process None ai_move )
       | Some g -> (
         print_string "You have already placed all of your pieces! Try another command.\n";
         process gamestate ai_move)
