@@ -182,7 +182,8 @@ let new_game () =
     else (
       print_string ("\n\nPlease place these pieces on the board: "^
         (piecelst_to_string pieces));
-      print_string "\n\nWhere would you like to place your next piece?
+      print_string "\n\nWhere would you like to place your next piece? You
+      can place your pieces in the first two rows. (Rows 1 and 2)
       Format: 'place <piece> <location>', where <piece> is the name of the
       piece as listed in the list of pieces above, and <location> is the
       location formatted as (row,column). ex: place Spy1 (2,3)
