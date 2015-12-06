@@ -190,28 +190,31 @@ let new_game () =
             ex: place Spy1 (2,3)\nType here --> ";
       let input = read_line() in
       (* TODO: not yet fixed *)
-      let place = parse input in
+      let place = parse (input) in
       match place with
       | Place (pi, loc) -> (
-        if (List.mem pi pieces) then (
-          let new_human = add_human hum comp loc pi in
-          if (new_human = hum) then
-            (* Need to try again, bad placement *)
-            build_human new_human pieces
-          else (
-            let nboard = making_game new_human comp in
-            print_game_board nboard;
-            build_human new_human (List.filter (fun x -> x <> pi) pieces)
-          )
-        )
+        if (List.mem pi pieces)
+        then (
+          if ((fst loc) < 3 && (fst loc) > 0 && (snd loc) < 11 && (snd loc) > 0)
+            then (
+              let new_human = add_human hum comp loc pi in
+              if (new_human = hum) then
+              (* Need to try again, bad placement *)
+              build_human new_human pieces
+            else (
+              let nboard = making_game new_human comp in
+              print_game_board nboard;
+              build_human new_human (List.filter (fun x -> x <> pi) pieces)
+          ) ) else (print_string "\n\nThis is location is off the board!\n";
+        build_human hum pieces))
         else (
-          print_string "\n\nThis is not a valid piece";
+          print_string "\n\nThis is not a valid piece\n";
           build_human hum pieces
         )
       )
       | _ -> print_string "\n\nThis is not valid syntax for placing your pieces.
         Please try placing a piece.\n";
-        build_human hum c pieces
+        build_human hum pieces
     )
   ) in
   let empty_hum = newplayer "human" [] in
