@@ -328,7 +328,7 @@ let print_intro () : unit =
 (*Print function for when a player wins.*)
 let rec check_for_win new_gs ai_move =
   match new_gs with
-  | None -> process None ai_move
+  | None -> process new_gs ai_move
   | Some gs ->
     (if gs.human.won then
       (print_string "ALLSTAR!! YOU HAVE CAPTURED THE FLAG! YOU WIN! ";
@@ -383,14 +383,16 @@ and process gamestate ai_move =
       | None ->
           (print_string "You must start the game before you can move your pieces!\n";
           print_intro ();
-          process None ai_move)
+          process gamestate ai_move)
       | Some g ->
           (let new_gs = move g g.turn pce loc in
           check_for_win new_gs ai_move)
     )
   | Place (p,l) -> (
       match gamestate with
-      | None -> print_string "Initialization failed. Please quit and try again."
+      | None -> (
+        print_string "You must type 'newgame' before placing pieces.";
+        process None ai_move )
       | Some g -> (
         print_string "You have already placed all of your pieces! Try another command.\n";
         process gamestate ai_move)
