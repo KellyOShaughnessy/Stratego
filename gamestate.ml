@@ -350,9 +350,6 @@ let add_to_board game_board player piece location =
   in
   (new_gameboard, new_player_1)
 
-
-
-
 let piece_to_string (piece:piece) =
   match piece.pce with
   | "Flag" -> "Fla"^(string_of_int piece.id)
