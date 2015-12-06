@@ -130,9 +130,12 @@ let setup () =
 (* [opp_piece_exists gamestate end_dest] checks if there
 * exists an opposing player's piece at the end destination *)
 let opp_piece_exists gamestate end_dest =
-  match List.assoc end_dest gamestate.gb with
-  | None -> false
-  | Some (piece,player) -> player.name = "human"
+  try
+    (match List.assoc end_dest gamestate.gb with
+    | None -> false
+    | Some (piece,player) -> player.name = "human")
+  with
+  | Not_found -> false
 
 (* [choose_destination gamestate piece cur_location tried_locations]
 * returns: a location type option that is a valid move for the selected piece
@@ -169,7 +172,6 @@ let rec choose_destination gamestate piece cur_location tried_locations =
         )
       )
       in
-    Printf.printf "%d %d \n" (fst end_dest) (snd end_dest);
     (if List.mem end_dest tried_locations then
       choose_destination gamestate piece cur_location tried_locations
     else
@@ -189,6 +191,7 @@ let choose_piece player movable_pieces  =
   if List.length movable_pieces > 0 then
     let index64 = Random.int64 (of_int (List.length movable_pieces)) in
     let index = to_int index64 in
+    (*TODO: remove this print statement*)
     Printf.printf "piece index %d \n" index;
     let (pce_to_move, cur_location) = List.nth movable_pieces index in
     Some (pce_to_move, cur_location)
