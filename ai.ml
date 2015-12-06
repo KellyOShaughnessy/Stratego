@@ -130,9 +130,12 @@ let setup () =
 (* [opp_piece_exists gamestate end_dest] checks if there
 * exists an opposing player's piece at the end destination *)
 let opp_piece_exists gamestate end_dest =
-  match List.assoc end_dest gamestate.gb with
-  | None -> false
-  | Some (piece,player) -> player.name = "human"
+  try
+    (match List.assoc end_dest gamestate.gb with
+    | None -> false
+    | Some (piece,player) -> player.name = "human")
+  with
+  | Not_found -> false
 
 (* [choose_destination gamestate piece cur_location tried_locations]
 * returns: a location type option that is a valid move for the selected piece
