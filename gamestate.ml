@@ -350,8 +350,6 @@ let add_to_board game_board player piece location =
   in
   (new_gameboard, new_player_1)
 
-<<<<<<< HEAD
-=======
 let piece_to_string (piece:piece) =
   match piece.pce with
   | "Flag" -> "Fla"^(string_of_int piece.id)
@@ -416,7 +414,6 @@ let rec print_game_board (game_board:game_board)=
     Printf.printf "%s" s3;
     print_game_board t
 
->>>>>>> 20803433221d58ec6a271790e26561f579c06760
 (*
 We will now need to update the 'turn' field in gamestate instead of having the
 bool as part of the return value.
