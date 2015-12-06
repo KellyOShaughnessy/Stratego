@@ -192,6 +192,7 @@ let choose_piece player movable_pieces  =
   if List.length movable_pieces > 0 then
     let index64 = Random.int64 (of_int (List.length movable_pieces)) in
     let index = to_int index64 in
+    (*TODO: remove this print statement*)
     Printf.printf "piece index %d \n" index;
     let (pce_to_move, cur_location) = List.nth movable_pieces index in
     Some (pce_to_move, cur_location)
