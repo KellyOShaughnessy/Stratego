@@ -30,7 +30,8 @@ let print_retry () =
                       To see a list of commands, type \"help\".\n\n
                       Please type a command --> "
 
-let extract_piece (pc:string) : piece =
+(*TODO: fucks up when gets bad input, need a failwith*)
+let extract_piece (pc:string) : piece option=
   let pce_lst = [
     ("spy1",{pce="Spy";id=1});
     ("sco1", {pce="Scout";id=1});
@@ -52,8 +53,8 @@ let extract_piece (pc:string) : piece =
     ("lie2",{pce="Lieutenant";id=2});
     ("ser2",{pce="Sergeant";id=2});
     ("cor1",{pce="Corporal";id=1}) ] in
-  let ret_pce = (List.assoc pc pce_lst) in
-  ret_pce
+  if (List.mem_assoc pc pce_lst) then Some(List.assoc pc pce_lst)
+  else None
 
 (*Returns (-1,-1) if incorrect move format*)
 let extract_location_str (inp:string list) : string =
@@ -120,9 +121,10 @@ let rec parse inp =
       if (List.length input) > 2 then (
         let pce = extract_piece (List.nth input 1) in
         let loc = extract_location input in
-        match loc with
-        | (-1,-1) -> Invalid
-        | _ -> Move((pce,loc))
+        match pce,loc with
+        | _,(-1,-1) -> Invalid
+        | None,_    -> Invalid
+        | Some p,_  -> Move((p,loc))
       )
       else
         Invalid
@@ -132,9 +134,10 @@ let rec parse inp =
       if (List.length input) = 3 then (
         let pce = extract_piece (List.nth input 1) in
         let loc = extract_location input in
-        match loc with
-        | (-1,-1) -> Invalid
-        | _ -> Place((pce,loc)) )
+        match pce,loc with
+        | _,(-1,-1) -> Invalid
+        | None,_    -> Invalid
+        | Some p,_  -> Place((p,loc)) )
     else
       Invalid
     )
@@ -178,11 +181,11 @@ let new_game () =
     else (
       print_string ("\n\nPlease place these pieces on the board: "^
         (piecelst_to_string pieces));
-      print_string "\n\nWhere would you like to place your next piece?
-      Format: 'place <piece> <location>', where <piece> is the name of the
-      piece as listed in the list of pieces above, and <location> is the
-      location formatted as (row,column). ex: place Spy1 (2,3)
-      --> ";
+      Printf.printf "\n\nWhere would you like to place your next piece?
+      Format: 'place <piece> <location>'
+        - <piece> is the name of the piece as listed in the piece list above
+        - <location> is the location formatted as (row,column).
+            ex: place Spy1 (2,3)\nType here --> ";
       let input = read_line() in
       (* TODO: not yet fixed *)
       let place = parse input in
@@ -202,7 +205,7 @@ let new_game () =
         )
       )
       | _ -> print_string "\n\nThis is not valid syntax for placing your pieces.
-                            \nPlease try placing a piece.\n";
+                            Please try placing a piece.\n";
         build_human hum c pieces
     )
   ) in
