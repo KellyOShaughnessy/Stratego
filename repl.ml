@@ -3,6 +3,7 @@ open Ai
 open Pervasives
 (* NOTE: WHEN COMPILING, USE 'cs3110 compile -p str repl.ml' *)
 
+(* TODO: quit during initialization *)
 (* Defining possible commands *)
 type cmd =
   | Quit
@@ -53,7 +54,6 @@ let print_retry () =
                       To see a list of commands, type \"help\".\n\n
                       Please type a command --> "
 
-(*TODO: fucks up when gets bad input, need a failwith*)
 let extract_piece (pc:string) : piece option=
   let pce_lst = [
     ("spy1",{pce="Spy";id=1});
@@ -393,7 +393,7 @@ and process gamestate ai_move =
     let new_ai_move = next_move gamestate [] ai_move [] in
     process gamestate new_ai_move)
   else (
-  print_string "Type a command --> ";
+  print_string "To see list of commands, type 'help'\nType a command --> ";
   let cmd = parse (read_line()) in
   match cmd with
   | Quit -> (quit_game gamestate ai_move)
@@ -450,7 +450,7 @@ and process gamestate ai_move =
           print_intro ();
           process None ai_move)
       | Some g ->
-          print_gamestate g;
+          print_board g;
           process gamestate ai_move
     )
   | Instructions -> (
