@@ -177,11 +177,9 @@ let new_game () =
     [sp1; sc1; cap1; maj1; f1; ser1; co1; mi1; g1; cap2; mi2; ma1; l1; b1; b2;
     b3; sc2; l2; ser2; cor1]
   in
-  let rec build_human hum c pieces = (
-    let new_board = making_game hum c in
-    print_game_board new_board;
+  let rec build_human hum pieces = (
     if (List.length hum.pieces = List.length comp.pieces && pieces = [])
-      then (let newer = new_gamestate hum c in newer)
+      then (let newer = new_gamestate hum comp in newer)
     else (
       print_string ("\n\nPlease place these pieces on the board: "^
         (piecelst_to_string pieces));
@@ -192,29 +190,39 @@ let new_game () =
             ex: place Spy1 (2,3)\nType here --> ";
       let input = read_line() in
       (* TODO: not yet fixed *)
-      let place = parse input in
+      let place = parse (input) in
       match place with
       | Place (pi, loc) -> (
-        if (List.mem pi pieces) then (
-          let new_human = add_human hum c loc pi in
-          if new_human = hum then
-            (* Need to try again, bad placement *)
-            build_human hum c pieces
-          else
-            build_human new_human c (List.filter (fun x -> x <> pi) pieces)
-        )
+        if (List.mem pi pieces)
+        then (
+          if ((fst loc) < 3 && (fst loc) > 0 && (snd loc) < 11 && (snd loc) > 0)
+            then (
+              let new_human = add_human hum comp loc pi in
+              if (new_human = hum) then
+              (* Need to try again, bad placement *)
+              build_human new_human pieces
+            else (
+              let nboard = making_game new_human comp in
+              print_game_board nboard;
+              build_human new_human (List.filter (fun x -> x <> pi) pieces)
+          ) ) else (print_string "\n\nThis is location is off the board!\n";
+        build_human hum pieces))
         else (
-          print_string "\n\nThis is not a valid piece";
-          build_human hum c pieces
+          print_string "\n\nThis is not a valid piece\n";
+          build_human hum pieces
         )
       )
       | _ -> print_string "\n\nThis is not valid syntax for placing your pieces.
         Please try placing a piece.\n";
-        build_human hum c pieces
+        build_human hum pieces
     )
   ) in
   let empty_hum = newplayer "human" [] in
-  build_human empty_hum comp piece_list
+  let new_board = making_game empty_hum comp in
+  print_game_board new_board;
+  let gamestate = build_human empty_hum piece_list
+  in print_gamestate gamestate;
+  gamestate
 
 
 

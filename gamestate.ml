@@ -80,7 +80,7 @@ let making_game h c =
 let add_human (h: player) (c: player) (loc: location)
   (p: piece): player =
   let pieces = h.pieces in
-  if ((fst loc) <= 2 && (fst loc) > 0 && (snd loc) <= 10 && (fst loc) > 0)
+  if ((fst loc) < 3 && (fst loc) > 0 && (snd loc) < 11 && (snd loc) > 0)
     then (
       let newp = pieces@[(p,loc)] in
       let human = {name= h.name; pieces = newp;
@@ -88,9 +88,9 @@ let add_human (h: player) (c: player) (loc: location)
       in
       human
     )
-  else
-    let _ = Printf.printf "You cannot place a piece here!! Try again. \n" in
-    h
+  else (
+    let _ = Printf.printf "\n\nYou cannot place a piece here!! Try again. \n" in
+    h)
 
 (* Initializes game state from user input and computer generated setup *)
 (* Testing:
