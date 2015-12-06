@@ -3,9 +3,6 @@ open Ai
 open Pervasives
 (* NOTE: WHEN COMPILING, USE 'cs3110 compile -p str repl.ml' *)
 
-(*TODO: add function to print opponent's graveyard list*)
-(*TODO: add restart function*)
-
 (* Defining possible commands *)
 type cmd =
   | Quit
@@ -313,7 +310,7 @@ let print_intro () : unit =
   get started, 'instructions' to understand how to play, or 'quit'
   if you just aren't up for the challenge right now.\n"
 
-(*TODO: Print function for when a player wins. Add in restart capabilities*)
+(*Print function for when a player wins.*)
 let rec check_for_win new_gs ai_move =
   match new_gs with
   | None -> process None ai_move
@@ -424,7 +421,6 @@ and process gamestate ai_move =
 )
 
 (*Main function that begins gameplay prompting*)
-(*NOTE: I think main function needs to be all units; can't return gamestate*)
 let () =
   Printf.printf "\nWelcome to Stratego!\n\n";
   print_string "Check out the commands below.\n";
