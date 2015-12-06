@@ -1,3 +1,80 @@
+commit d7379a9c60f307e07934f2024cfcc6c30c02da81
+Merge: a1eb9c0 4ce1692
+Author: KellyOShaughnessy <kelly.oshaughnessy2@gmail.com>
+Date:   Sat Dec 5 23:38:59 2015 -0500
+
+    Merge branch 'master' of https://github.com/sdl83/Stratego
+
+commit a1eb9c04f2f3cf4787aeef29f3905be37ee278ac
+Author: KellyOShaughnessy <kelly.oshaughnessy2@gmail.com>
+Date:   Sat Dec 5 23:38:18 2015 -0500
+
+    fixed printing error
+
+ gamestate.ml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+commit 8a434baeae4ca08a90fab5454971c81862766f7a
+Author: KellyOShaughnessy <kelly.oshaughnessy2@gmail.com>
+Date:   Sat Dec 5 23:37:18 2015 -0500
+
+    takeaway double printing of gameboard
+
+ repl.ml | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+commit 4ce169243089049923ac396abc0e1f5bfce8e11d
+Merge: edc1892 6cb56cc
+Author: Robyn Nason <rsn48@cornell.edu>
+Date:   Sat Dec 5 23:34:31 2015 -0500
+
+    Merge branch 'master' of https://github.com/sdl83/Stratego
+    
+    : the commit.
+
+commit edc1892417c6defb064b0232fe4056e6c5ace4ff
+Author: Robyn Nason <rsn48@cornell.edu>
+Date:   Sat Dec 5 23:34:04 2015 -0500
+
+    fixed issue where corporal wasn't being checked, as well as some other things
+
+ gamestate.ml | 5 ++++-
+ repl.ml      | 4 +++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+commit 6cb56cc82906234d8f26f1b844f01580bb5a4e7a
+Merge: e2bfca7 a1a59e2
+Author: KellyOShaughnessy <kelly.oshaughnessy2@gmail.com>
+Date:   Sat Dec 5 23:16:18 2015 -0500
+
+    Merge branch 'master' of https://github.com/sdl83/Stratego
+
+commit e2bfca77b20445e4c4f77ebb4e1703bb3a585947
+Author: KellyOShaughnessy <kelly.oshaughnessy2@gmail.com>
+Date:   Sat Dec 5 23:16:01 2015 -0500
+
+    added vclog and zip file
+
+ strategosrc.zip |  Bin 0 -> 22414 bytes
+ vclog.txt       | 1500 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 1500 insertions(+)
+
+commit a1a59e2440cb6c5a4ce8c9f321c98d1de158ac08
+Merge: c6c81d0 fb34f85
+Author: Robyn Nason <rsn48@cornell.edu>
+Date:   Sat Dec 5 23:07:31 2015 -0500
+
+    Merge branch 'master' of https://github.com/sdl83/Stratego
+
+commit c6c81d0f8e502e47a86b6fd9c5aff52f4ecb3bb4
+Author: Robyn Nason <rsn48@cornell.edu>
+Date:   Sat Dec 5 23:07:07 2015 -0500
+
+    prints gameboard only once at start
+
+ repl.ml | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
 commit fb34f85a762a2008930528892ab7cad66d8278f7
 Author: KellyOShaughnessy <kelly.oshaughnessy2@gmail.com>
 Date:   Sat Dec 5 23:02:43 2015 -0500
