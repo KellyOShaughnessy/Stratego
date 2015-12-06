@@ -365,13 +365,13 @@ let rec check_for_win new_gs ai_move =
   | None -> process new_gs ai_move
   | Some gs ->
     (if gs.human.won then
-      (print_string "ALLSTAR!! YOU HAVE CAPTURED THE FLAG! YOU WIN! ";
-      print_string "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ";
+      (print_string "\nALLSTAR!! YOU HAVE CAPTURED THE FLAG! YOU WIN!\n ";
+      print_string "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n";
       print_string "Play again? ";
       process None ai_move)
     else if gs.comp.won then
-      (print_string "The computer beat you! AI's are taking over ";
-      print_string "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  ";
+      (print_string "\nThe computer beat you! AI's are taking over \n";
+      print_string "\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ \n ";
       print_string "You can do better than that, try again? ";
       process None ai_move)
     else
