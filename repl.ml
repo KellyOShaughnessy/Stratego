@@ -390,7 +390,6 @@ and quit_game game ai_move =
     else (print_string "\nPlease answer yes or no."; quit_game game ai_move)
 
 and process gamestate ai_move =
-  let _ = (match gamestate with | None -> () | Some g -> print_gamestate g) in
   let name = (
     match gamestate with
     | Some g -> g.turn.name
@@ -399,15 +398,20 @@ and process gamestate ai_move =
     if name = "comp"
       then
         (match next_move gamestate [] ai_move [] with
-        | None -> failwith "unimplemented, computer has lost has no more moves"
+        | None ->
+          print_string "YOU WON!!! The computer has no more moves! \n";
+          NewGame
         | Some(piece,loc) -> Move(piece,loc))
     else (
+      let _ = (match gamestate with | None -> () | Some g -> print_gamestate g) in
       print_string "To see list of commands, type 'help'\nType a command --> ";
       parse (read_line()))
   )
  in
   match cmd with
-  | Quit -> (quit_game gamestate ai_move)
+  | Quit ->
+    let _ = (match gamestate with | None -> () | Some g -> print_gamestate g) in
+    (quit_game gamestate ai_move)
   | NewGame -> (
       let g = new_game () in
       process (Some(g)) ai_move
