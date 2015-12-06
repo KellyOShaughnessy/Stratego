@@ -31,7 +31,7 @@ val parse       : string -> cmd
 val new_game    : unit -> gamestate
 
 (* [quit gamestate] returns the final gamestate and quits the game *)
-val quit        : gamestate -> unit
+val quit_game       : gamestate option -> ((piece*location) option) -> unit
 
 (* [print_help ()] prints the full help menu with all options.
  * contains all of the instructions and commands. a block of text*)
