@@ -218,22 +218,29 @@ let new_game () =
         if (List.mem pi pieces)
         then (
           if ((fst loc) < 3 && (fst loc) > 0 && (snd loc) < 11 && (snd loc) > 0)
-            then (
-              let new_human = add_human hum comp loc pi in
-              if (new_human = hum) then
-              (* Need to try again, bad placement *)
-              build_human new_human pieces
-            else (
-              let nboard = making_game new_human comp in
-              print_game_board nboard;
-              build_human new_human (List.filter (fun x -> x <> pi) pieces)
-          ) ) else (print_string "\n\nThis is location is off the board!\n";
-        build_human hum pieces))
+          then (
+              let board = making_game hum comp in
+              if (List.assoc loc board = None)
+              then (
+                  let new_human = add_human hum comp loc pi in
+                  let nboard = making_game new_human comp in
+                  print_game_board nboard;
+                  build_human new_human (List.filter (fun x -> x <> pi) pieces)
+                )
+                else (print_string "There is a piece in this location";
+                build_human hum pieces)
+              )
+          else (print_string "\n\nThis location is not in your allocated space of
+           the board! Please place your piece within rows 1 and 2 and columns 1-10.
+           \n";
+           build_human hum pieces)
+          )
         else (
           print_string "\n\nThis is not a valid piece\n";
           build_human hum pieces
         )
       )
+      | Quit -> print_string "\nOk. Goodbuy!\n\n"; exit 0
       | _ -> print_string "\n\nThis is not valid syntax for placing your pieces.
         Please try placing a piece.\n";
         build_human hum pieces
@@ -372,7 +379,7 @@ let rec check_for_win new_gs ai_move =
 (****************************GAME PLAY REPL*************************************)
 
 and quit_game game ai_move =
-  print_string "Now quitting the game :'( - Play again soon!\n \n";
+(*   print_string "Now quitting the game :'( - Play again soon!\n \n"; *)
     print_string "\nAre you sure you would like to quit this game? Type yes or no. \n\n-> ";
     let prompt2 = read_line () in
     let response2 =  String.lowercase(prompt2) in
