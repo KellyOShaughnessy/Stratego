@@ -5,7 +5,6 @@ open Pervasives
 
 (*TODO: add function to print opponent's graveyard list*)
 (*TODO: add restart function*)
-(*TODO: check the 'won' flag in gamestate*)
 
 (* Defining possible commands *)
 type cmd =
@@ -347,7 +346,6 @@ let rec check_for_win new_gs ai_move =
 (*TODO: process needs to return a unit because this is the main repl function.
 This might conflict with how the 'move' function returns a gamestate option.*)
 and process gamestate ai_move =
-  (*TODO: check if 'won' is true*)
   let name = (
     match gamestate with
     | Some g -> g.turn.name
