@@ -350,6 +350,73 @@ let add_to_board game_board player piece location =
   in
   (new_gameboard, new_player_1)
 
+<<<<<<< HEAD
+=======
+let piece_to_string (piece:piece) =
+  match piece.pce with
+  | "Flag" -> "Fla"^(string_of_int piece.id)
+  | "Bomb" -> "Bom"^(string_of_int piece.id)
+  | "Spy" -> "Spy"^(string_of_int piece.id)
+  | "Scout" -> "Sco"^(string_of_int piece.id)
+  | "Marshal" -> "Mar"^(string_of_int piece.id)
+  | "General" -> "Gen"^(string_of_int piece.id)
+  | "Miner" -> "Min"^(string_of_int piece.id)
+  | "Colonel" -> "Col"^(string_of_int piece.id)
+  | "Major" -> "Maj"^(string_of_int piece.id)
+  | "Captain" -> "Cap"^(string_of_int piece.id)
+  | "Lieutenant" -> "Lie"^(string_of_int piece.id)
+  | "Sergeant" -> "Ser"^(string_of_int piece.id)
+  | "Corporal" -> "Cor"^(string_of_int piece.id)
+  | _ -> failwith "not a piece"
+
+let piecelst_to_string (ls: piece list): string=
+  let lststr = "[" in
+  let rec addp l s =
+  match l with
+  | [] -> "Currently empty"
+  | h::[] -> s^(piece_to_string h)^"]"
+  | h::t -> (let news =  s^(piece_to_string h)^"; " in
+  (addp t news)
+  ) in addp ls lststr
+
+let rec print_game_board (game_board:game_board)=
+  match game_board with
+  | [] -> ()
+  | ((row,col),some_piece)::t ->
+    let s1 =
+      (match some_piece with
+      | None -> "    "
+      | Some (piece,player) ->
+          if player.name="human" then
+            (piece_to_string piece)
+          else
+            " X  ")
+    in
+    let s2 =
+      (if col=1 && row!=10 then
+        "     "^
+        "-----------------------------------------------------------------------\n  "^
+        (string_of_int row)^"  | "^s1^" |"
+      else if col=1 && row=10 then
+        "     "^
+        "-----------------------------------------------------------------------\n "^
+        (string_of_int row)^"  | "^s1^" |"
+      else if col=10 then
+        " "^s1^" |\n"
+      else
+        " "^s1^" |")
+    in
+    let s3 = (
+      if row = 1 && col = 10 then
+       s2^"     -----------------------------------------------------------------------"
+       ^"\n        1      2      3      4      5      6      7      8      9     10\n"
+
+     else s2
+    ) in
+    Printf.printf "%s" s3;
+    print_game_board t
+
+>>>>>>> 20803433221d58ec6a271790e26561f579c06760
 (*
 We will now need to update the 'turn' field in gamestate instead of having the
 bool as part of the return value.
