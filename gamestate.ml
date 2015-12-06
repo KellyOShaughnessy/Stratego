@@ -245,6 +245,9 @@ let validate_move gb pl pc dest =
     | "Colonel" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
+    | "Corporal" ->
+      if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
+      else (false, None)
     | "Major" ->
       if (simple_validate pl pc dest gb) then (true,get_piece dest gb)
       else (false,None)
@@ -449,7 +452,7 @@ let move gamestate player piece end_location =
           in
           Some new_gs
       | Some (pce,plyr) ->
-          Printf.printf "What a battle! %s won, %s stays!" plyr.name pce.pce;
+          Printf.printf "What a battle! %s won, %s stays!\n" plyr.name pce.pce;
 
           (* Attacking player 'wins' the attack *)
           if player.name = plyr.name then
