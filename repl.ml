@@ -356,7 +356,7 @@ let print_intro () : unit =
 (*Print function for when a player wins.*)
 let rec check_for_win new_gs ai_move =
   match new_gs with
-  | None -> process None ai_move
+  | None -> process new_gs ai_move
   | Some gs ->
     (if gs.human.won then
       (print_string "ALLSTAR!! YOU HAVE CAPTURED THE FLAG! YOU WIN! ";
