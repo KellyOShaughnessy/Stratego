@@ -315,101 +315,123 @@ let print_intro () : unit =
   if you just aren't up for the challenge right now.\n"
 
 (*TODO: Print function for when a player wins. Add in restart capabilities*)
-(* let check_for_win gamestate : bool =
-  match gamestate with
-  | None -> false
-  | Some x -> (
-      if x.turn.won = true
-      then true (print_game x; win ())
-  print_string "
-    \n\n~~~~~~~~~~~~~~~~~~~~~~~~~WINNER!!!!!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n" *)
+let rec check_for_win new_gs ai_move =
+  match new_gs with
+  | None -> process None ai_move
+  | Some gs ->
+    (if gs.human.won then
+      (print_string "ALLSTAR!! YOU HAVE CAPTURED THE FLAG! YOU WIN! ";
+      print_string "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ";
+      print_string "Play again? ";
+      process None ai_move)
+    else if gs.comp.won then
+      (print_string "The computer beat you! AI's are taking over ";
+      print_string "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  ";
+      print_string "You can do better than that, try again? ";
+      process None ai_move)
+    else
+      process new_gs ai_move)
 
 (****************************GAME PLAY REPL*************************************)
 
 
-let rec quit_game game =
+and quit_game game ai_move =
   print_string "Now quitting the game :'( - Play again soon!\n \n";
     print_string "\nAre you sure you would like to quit this game? Type yes or no. \n\n-> ";
     let prompt2 = read_line () in
     let response2 =  String.lowercase(prompt2) in
     if response2 = "no"
-    then (print_string "\nOK.\n\n"; process (game))
+    then (print_string "\nOK.\n\n"; process game ai_move)
     else if response2 = "yes" then Printf.printf "\nGoodbuy.\n\n"
-    else (print_string "\nPlease answer yes or no."; quit_game (game))
+    else (print_string "\nPlease answer yes or no."; quit_game game ai_move)
 
 (*TODO: I took out bool in the (bool*gamestate) tuple so need to actually change
  the "turn" field in gamestate at each stage for whose turn it is *)
 (*TODO: process needs to return a unit because this is the main repl function.
 This might conflict with how the 'move' function returns a gamestate option.*)
-and process gamestate =
+
+(*TODO: process needs to return a unit because this is the main repl function.
+This might conflict with how the 'move' function returns a gamestate option.*)
+and process gamestate ai_move =
   (*TODO: check if 'won' is true*)
+  let name = (
+    match gamestate with
+    | Some g -> g.turn.name
+    | None -> "" ) in
+  if (name = "computer")
+    then (
+    let new_ai_move = next_move gamestate [] ai_move [] in
+    process gamestate new_ai_move)
+  else (
   print_string "Type a command --> ";
   let cmd = parse (read_line()) in
   match cmd with
-  | Quit -> (quit_game gamestate)
+  | Quit -> (quit_game gamestate ai_move)
   | NewGame -> (
       let g = new_game () in
       print_game g;
-      process (Some(g))
+      process (Some(g)) ai_move
     )
   | Help -> (
       print_help ();
-      process gamestate
+      process gamestate ai_move
     )
   | Move (pce,loc) -> (
       match gamestate with
-      | None -> (
-          print_string "You must start the game before you can move your pieces!\n";
+      | None ->
+          (print_string "You must start the game before you can move your pieces!\n";
           print_intro ();
-          process None)
-      | Some g -> (
-        process (move g g.turn pce loc) )
+          process None ai_move)
+      | Some g ->
+          (let new_gs = move g g.turn pce loc in
+          check_for_win new_gs ai_move)
     )
   | Place (p,l) -> (
       match gamestate with
       | None -> print_string "Initialization failed. Please quit and try again."
       | Some g -> (
         print_string "You have already placed all of your pieces!\n";
-        process gamestate )
+        process gamestate ai_move)
     )
   | Pieces -> (
       match gamestate with
       | None -> (
           print_string "You must start the game before you can print your pieces!\n";
           print_intro ();
-          process None )
+          process None ai_move)
       | Some g ->
           print_pieces g;
-          process gamestate
+          process gamestate ai_move
     )
   | Graveyard -> (
       match gamestate with
       | None -> (
           print_string "You must start the game before you can print your graveyard!\n";
           print_intro ();
-          process None )
+          process None ai_move)
       | Some g ->
           print_graveyard g.human;
-          process gamestate
+          process gamestate ai_move
     )
   | Board ->(
       match gamestate with
       | None -> (
           print_string "You must start the game before you can print the board!\n";
           print_intro ();
-          process None )
+          process None ai_move)
       | Some g ->
           print_graveyard g.human;
-          process gamestate
+          process gamestate ai_move
     )
   | Instructions -> (
       print_instructions ();
-      process gamestate
+      process gamestate ai_move
     )
   | Invalid -> (
       print_retry ();
-      process gamestate
+      process gamestate ai_move
     )
+)
 
 
 
@@ -421,4 +443,5 @@ let () =
   print_string "Check out the commands below.\n";
   print_intro ();
   print_help ();
-  process None
+  process None None
+
