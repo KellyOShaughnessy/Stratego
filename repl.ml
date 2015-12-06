@@ -378,7 +378,7 @@ and process gamestate ai_move =
       | None -> print_string "Initialization failed. Please quit and try again."
       | Some g -> (
         print_string "You have already placed all of your pieces! Try another command.\n";
-        process gamestate )
+        process gamestate ai_move)
     )
   | Pieces -> (
       match gamestate with
