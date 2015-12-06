@@ -16,6 +16,29 @@ type cmd =
   | Graveyard
   | Board
   | Instructions
+  | QuickStart
+
+let hum_quickstart_pces =
+    [({pce="Spy";id=1},(1,1));
+    ({pce="Scout";id=1},(1,2));
+    ({pce="Captain";id=1},(1,3));
+    ({pce="Major";id=1},(1,4));
+    ({pce="Flag";id=1},(1,5));
+    ({pce="Sergeant";id=1},(1,6));
+    ({pce="Colonel";id=1},(1,7));
+    ({pce="Miner";id=1},(1,8));
+    ({pce="General";id=1},(1,9));
+    ({pce="Captain";id=2},(1,10));
+    ({pce="Miner";id=2},(2,1));
+    ({pce="Marshal";id=1},(2,2));
+    ({pce="Lieutenant";id=1},(2,3));
+    ({pce="Bomb";id=1},(2,4));
+    ({pce="Bomb";id=2},(2,5));
+    ({pce="Bomb";id=3},(2,6));
+    ({pce="Scout";id=2},(2,7));
+    ({pce="Lieutenant";id=2},(2,8));
+    ({pce="Sergeant";id=2},(2,9));
+    ({pce="Corporal";id=1},(2,10))]
 
 let fix_input (inp:string) : string list =
   (*lowercase & get rid of extraneous characters*)
@@ -116,6 +139,7 @@ let rec parse inp =
     | "instructions" -> Instructions
     | "new" -> NewGame
     | "newgame" -> NewGame
+    | "quickstart" -> QuickStart
     | "ng" -> NewGame
     | "move" -> (
       (*Extracting piece & location from user input*)
@@ -179,7 +203,7 @@ let new_game () =
   in
   let rec build_human hum pieces = (
     if (List.length hum.pieces = List.length comp.pieces && pieces = [])
-      then (let newer = new_gamestate hum comp in newer)
+      then (new_gamestate hum comp)
     else (
       print_string ("\n\nPlease place these pieces on the board: "^
         (piecelst_to_string pieces));
@@ -224,6 +248,10 @@ let new_game () =
   in print_gamestate gamestate;
   gamestate
 
+let quickstart () =
+  let comp = setup () in
+  let human = {comp with name = "human"; pieces=hum_quickstart_pces} in
+  new_gamestate human comp
 
 
 (******************************PRINT FUNCTIONS*********************************)
@@ -431,6 +459,11 @@ and process gamestate ai_move =
       print_instructions ();
       process gamestate ai_move
     )
+  | QuickStart ->  (
+      let g = quickstart () in
+      print_gamestate g;
+      process (Some g) ai_move
+  )
   | Invalid -> (
       print_retry ();
       process gamestate ai_move
