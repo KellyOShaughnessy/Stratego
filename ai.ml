@@ -172,7 +172,6 @@ let rec choose_destination gamestate piece cur_location tried_locations =
         )
       )
       in
-    Printf.printf "%d %d \n" (fst end_dest) (snd end_dest);
     (if List.mem end_dest tried_locations then
       choose_destination gamestate piece cur_location tried_locations
     else

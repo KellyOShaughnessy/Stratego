@@ -350,6 +350,8 @@ let add_to_board game_board player piece location =
   in
   (new_gameboard, new_player_1)
 
+<<<<<<< HEAD
+=======
 let piece_to_string (piece:piece) =
   match piece.pce with
   | "Flag" -> "Fla"^(string_of_int piece.id)
@@ -414,6 +416,7 @@ let rec print_game_board (game_board:game_board)=
     Printf.printf "%s" s3;
     print_game_board t
 
+>>>>>>> 20803433221d58ec6a271790e26561f579c06760
 (*
 We will now need to update the 'turn' field in gamestate instead of having the
 bool as part of the return value.
@@ -423,10 +426,16 @@ let move gamestate player piece end_location =
   let game_board = gamestate.gb in
   match validate_move game_board player piece end_location with
   | (true, Some opp_piece) ->
-    let opp_player = (if player.name ="human" then gamestate.comp else
-    gamestate.human) in
+    Printf.printf "Oohh! an attack! %s vs. %s \n" piece.pce opp_piece.pce;
+    let opp_player =
+      (if player.name ="human" then
+        gamestate.comp
+      else
+      gamestate.human)
+    in
       (match attack piece opp_piece player opp_player with
       | None ->
+          Printf.printf "Wow, you both lost! \n";
           let (removed_start_gb, new_player) = remove_from_board game_board
                                                 player piece start_location in
           let (removed_end_gb, new_opp_player) = remove_from_board
@@ -443,10 +452,12 @@ let move gamestate player piece end_location =
           in
           Some new_gs
       | Some (pce,plyr) ->
-          let (removed_start_gb, new_player) = remove_from_board game_board
-                                                player piece start_location in
+          Printf.printf "What a battle! %s won, %s stays!" plyr.name pce.pce;
+
           (* Attacking player 'wins' the attack *)
-          if new_player.name = plyr.name then
+          if player.name = plyr.name then
+            let (removed_start_gb, new_player) = remove_from_board game_board
+                                                plyr piece start_location in
             let (add_end_gb, newer_player) = add_to_board removed_start_gb
                                                 new_player pce
                                                 end_location in
@@ -462,8 +473,10 @@ let move gamestate player piece end_location =
               Some {comp = newer_player; human = new_opp;
                 gb=add_end_gb; turn=new_opp}
           else
+              let (removed_start_gb, new_player) = remove_from_board game_board
+                                                player piece start_location in
               let (add_end_gb, opp_player) = add_to_board removed_start_gb
-                                                  gamestate.comp pce
+                                                  plyr pce
                                                   end_location in
               let new_pl_graveyard = piece::new_player.graveyard in
               let new_pl_pieces = remove_from_pieces piece new_player.pieces in
@@ -489,7 +502,85 @@ let move gamestate player piece end_location =
       else
         Some {gamestate with gb = added_gb; comp = newer_player;
             turn = gamestate.human}
-  | (false, _) -> None
+  | (false, _) -> Printf.printf "Sneaky, but you can't move here\n"; None
+
+
+
+let piece_to_string (piece:piece) =
+  match piece.pce with
+  | "Flag" -> "Fla"^(string_of_int piece.id)
+  | "Bomb" -> "Bom"^(string_of_int piece.id)
+  | "Spy" -> "Spy"^(string_of_int piece.id)
+  | "Scout" -> "Sco"^(string_of_int piece.id)
+  | "Marshal" -> "Mar"^(string_of_int piece.id)
+  | "General" -> "Gen"^(string_of_int piece.id)
+  | "Miner" -> "Min"^(string_of_int piece.id)
+  | "Colonel" -> "Col"^(string_of_int piece.id)
+  | "Major" -> "Maj"^(string_of_int piece.id)
+  | "Captain" -> "Cap"^(string_of_int piece.id)
+  | "Lieutenant" -> "Lie"^(string_of_int piece.id)
+  | "Sergeant" -> "Ser"^(string_of_int piece.id)
+  | "Corporal" -> "Cor"^(string_of_int piece.id)
+  | _ -> failwith "not a piece"
+
+let piecelst_to_string (ls: piece list): string=
+  let lststr = "[" in
+  let rec addp l s =
+  match l with
+  | [] -> "Currently empty"
+  | h::[] -> s^(piece_to_string h)^"]"
+  | h::t -> (let news =  s^(piece_to_string h)^"; " in
+  (addp t news)
+  ) in addp ls lststr
+
+let rec print_game_board (game_board:game_board)=
+  match game_board with
+  | [] -> ()
+  | ((row,col),some_piece)::t ->
+    let s1 =
+      (match some_piece with
+      | None -> "    "
+      | Some (piece,player) ->
+          if player.name="human" then
+            (piece_to_string piece)
+          else
+            " X  ")
+    in
+    let s2 =
+      (if col=1 && row!=10 then
+        "     "^
+        "-----------------------------------------------------------------------\n  "^
+        (string_of_int row)^"  | "^s1^" |"
+      else if col=1 && row=10 then
+        "     "^
+        "-----------------------------------------------------------------------\n "^
+        (string_of_int row)^"  | "^s1^" |"
+      else if col=10 then
+        " "^s1^" |\n"
+      else
+        " "^s1^" |")
+    in
+    let s3 = (
+      if row = 1 && col = 10 then
+       s2^"     -----------------------------------------------------------------------"
+       ^"\n        1      2      3      4      5      6      7      8      9     10\n"
+
+     else s2
+    ) in
+    Printf.printf "%s" s3;
+    print_game_board t
+
+(* Displays the computer's pieces as well *)
+let debug_print_gameboard gamestate =
+  let new_gb =
+    (List.map
+      (fun (loc, opt) ->
+        (match opt with
+        | None -> (loc, None)
+        | Some (piece,player) -> (loc, Some(piece,gamestate.human)))
+    )
+    gamestate.gb) in
+  print_game_board new_gb
 
 
 let print_gamestate (gamestate:gamestate) =
@@ -504,14 +595,3 @@ let print_gamestate (gamestate:gamestate) =
   in
   Printf.printf "     Turn: %s\n\n" t
 
-(* Displays the computer's pieces as well *)
-let debug_print_gameboard gamestate =
-  let new_gb =
-    (List.map
-      (fun (loc, opt) ->
-        (match opt with
-        | None -> (loc, None)
-        | Some (piece,player) -> (loc, Some(piece,gamestate.human)))
-    )
-    gamestate.gb) in
-  print_game_board new_gb
