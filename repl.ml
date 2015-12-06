@@ -113,8 +113,6 @@ let extract_location (inp:string list) : int*int =
           let after_com  =
            (try int_of_string (String.sub loc_str (comma+1) (last - comma -1))
             with | Failure x -> -1 | Not_found -> -1) in
-           Printf.printf "\nafter_com -> %d, %d" comma (last - comma);
-           Printf.printf "\nLoc -> (%d,%d)\n" before_com after_com ;
           (before_com,after_com)
         else
           (-1,-1)
