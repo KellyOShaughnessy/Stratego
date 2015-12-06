@@ -390,7 +390,7 @@ and quit_game game ai_move =
     else (print_string "\nPlease answer yes or no."; quit_game game ai_move)
 
 and process gamestate ai_move =
-  let _ = (match gamestate with | None -> () | Some g -> debug_print_gameboard g) in
+  let _ = (match gamestate with | None -> () | Some g -> print_gamestate g) in
   let name = (
     match gamestate with
     | Some g -> g.turn.name
@@ -410,7 +410,6 @@ and process gamestate ai_move =
   | Quit -> (quit_game gamestate ai_move)
   | NewGame -> (
       let g = new_game () in
-      print_game g;
       process (Some(g)) ai_move
     )
   | Help -> (
@@ -474,7 +473,6 @@ and process gamestate ai_move =
     )
   | QuickStart ->  (
       let g = quickstart () in
-      print_gamestate g;
       process (Some g) ai_move
   )
   | Invalid -> (
