@@ -39,5 +39,5 @@ val print_help  : unit -> unit
 
 (* [process gamestate] processes the comand [cmd] and initiates the change.
 * Returns the updated gamestate. calls all of the gamestate functions. *)
-val process     : gamestate option -> unit
+val process     : gamestate option -> ((piece*location) option) -> unit
 
