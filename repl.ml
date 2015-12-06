@@ -4,6 +4,7 @@ open Pervasives
 (* NOTE: WHEN COMPILING, USE 'cs3110 compile -p str repl.ml' *)
 
 (* TODO: quit during initialization *)
+(* TODO: make sure it doesn't print two gameboards when you do quickstart*)
 (* Defining possible commands *)
 type cmd =
   | Quit
@@ -171,9 +172,6 @@ let rec parse inp =
     | _ -> Invalid
   in cmd
 
-
-(* TODO: Need testing!! *)
-(* TODO: didn't fix failwith thing for checking if pieces are placed appropriately *)
 let new_game () =
   let comp = setup () in
   let sp1 = {pce="Spy";id=1} in
