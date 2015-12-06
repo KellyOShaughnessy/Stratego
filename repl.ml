@@ -3,6 +3,7 @@ open Ai
 open Pervasives
 (* NOTE: WHEN COMPILING, USE 'cs3110 compile -p str repl.ml' *)
 
+(* TODO: quit during initialization *)
 (* Defining possible commands *)
 type cmd =
   | Quit
@@ -15,6 +16,29 @@ type cmd =
   | Graveyard
   | Board
   | Instructions
+  | QuickStart
+
+let hum_quickstart_pces =
+    [({pce="Spy";id=1},(1,1));
+    ({pce="Scout";id=1},(1,2));
+    ({pce="Captain";id=1},(1,3));
+    ({pce="Major";id=1},(1,4));
+    ({pce="Flag";id=1},(1,5));
+    ({pce="Sergeant";id=1},(1,6));
+    ({pce="Colonel";id=1},(1,7));
+    ({pce="Miner";id=1},(1,8));
+    ({pce="General";id=1},(1,9));
+    ({pce="Captain";id=2},(1,10));
+    ({pce="Miner";id=2},(2,1));
+    ({pce="Marshal";id=1},(2,2));
+    ({pce="Lieutenant";id=1},(2,3));
+    ({pce="Bomb";id=1},(2,4));
+    ({pce="Bomb";id=2},(2,5));
+    ({pce="Bomb";id=3},(2,6));
+    ({pce="Scout";id=2},(2,7));
+    ({pce="Lieutenant";id=2},(2,8));
+    ({pce="Sergeant";id=2},(2,9));
+    ({pce="Corporal";id=1},(2,10))]
 
 let fix_input (inp:string) : string list =
   (*lowercase & get rid of extraneous characters*)
@@ -30,7 +54,6 @@ let print_retry () =
                       To see a list of commands, type \"help\".\n\n
                       Please type a command --> "
 
-(*TODO: fucks up when gets bad input, need a failwith*)
 let extract_piece (pc:string) : piece option=
   let pce_lst = [
     ("spy1",{pce="Spy";id=1});
@@ -116,6 +139,7 @@ let rec parse inp =
     | "instructions" -> Instructions
     | "new" -> NewGame
     | "newgame" -> NewGame
+    | "quickstart" -> QuickStart
     | "ng" -> NewGame
     | "move" -> (
       (*Extracting piece & location from user input*)
@@ -179,7 +203,7 @@ let new_game () =
   in
   let rec build_human hum pieces = (
     if (List.length hum.pieces = List.length comp.pieces && pieces = [])
-      then (let newer = new_gamestate hum comp in newer)
+      then (new_gamestate hum comp)
     else (
       print_string ("\n\nPlease place these pieces on the board: "^
         (piecelst_to_string pieces));
@@ -231,6 +255,10 @@ let new_game () =
   in print_gamestate gamestate;
   gamestate
 
+let quickstart () =
+  let comp = setup () in
+  let human = {comp with name = "human"; pieces=hum_quickstart_pces} in
+  new_gamestate human comp
 
 
 (******************************PRINT FUNCTIONS*********************************)
@@ -335,7 +363,7 @@ let print_intro () : unit =
 (*Print function for when a player wins.*)
 let rec check_for_win new_gs ai_move =
   match new_gs with
-  | None -> process None ai_move
+  | None -> process new_gs ai_move
   | Some gs ->
     (if gs.human.won then
       (print_string "ALLSTAR!! YOU HAVE CAPTURED THE FLAG! YOU WIN! ";
@@ -363,17 +391,22 @@ and quit_game game ai_move =
     else (print_string "\nPlease answer yes or no."; quit_game game ai_move)
 
 and process gamestate ai_move =
+  let _ = (match gamestate with | None -> () | Some g -> print_gamestate g) in
   let name = (
     match gamestate with
     | Some g -> g.turn.name
     | None -> "" ) in
-  if (name = "computer")
-    then (
-    let new_ai_move = next_move gamestate [] ai_move [] in
-    process gamestate new_ai_move)
-  else (
-  print_string "Type a command --> ";
-  let cmd = parse (read_line()) in
+  let cmd = (
+    if name = "comp"
+      then
+        (match next_move gamestate [] ai_move [] with
+        | None -> failwith "unimplemented, computer has lost has no mroe moves"
+        | Some(piece,loc) -> Move(piece,loc))
+    else (
+      print_string "To see list of commands, type 'help'\nType a command --> ";
+      parse (read_line()))
+  )
+ in
   match cmd with
   | Quit -> (quit_game gamestate ai_move)
   | NewGame -> (
@@ -390,14 +423,18 @@ and process gamestate ai_move =
       | None ->
           (print_string "You must start the game before you can move your pieces!\n";
           print_intro ();
-          process None ai_move)
+          process gamestate ai_move)
       | Some g ->
           (let new_gs = move g g.turn pce loc in
-          check_for_win new_gs ai_move)
+          match new_gs with
+          | None -> process gamestate ai_move
+          | Some g -> check_for_win new_gs ai_move)
     )
   | Place (p,l) -> (
       match gamestate with
-      | None -> print_string "Initialization failed. Please quit and try again."
+      | None -> (
+        print_string "You must type 'newgame' before placing pieces.";
+        process None ai_move )
       | Some g -> (
         print_string "You have already placed all of your pieces! Try another command.\n";
         process gamestate ai_move)
@@ -429,18 +466,22 @@ and process gamestate ai_move =
           print_intro ();
           process None ai_move)
       | Some g ->
-          print_graveyard g.human;
+          print_board g;
           process gamestate ai_move
     )
   | Instructions -> (
       print_instructions ();
       process gamestate ai_move
     )
+  | QuickStart ->  (
+      let g = quickstart () in
+      print_gamestate g;
+      process (Some g) ai_move
+  )
   | Invalid -> (
       print_retry ();
       process gamestate ai_move
     )
-)
 
 (*Main function that begins gameplay prompting*)
 let () =

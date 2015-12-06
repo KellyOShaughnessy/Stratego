@@ -18,6 +18,7 @@ type cmd =
   | Graveyard
   | Board
   | Instructions
+  | QuickStart
 
 (* [print_game gamestate] prints the gameboard.*)
 val print_game  : gamestate -> unit
