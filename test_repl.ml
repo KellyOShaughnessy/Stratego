@@ -209,7 +209,7 @@ TEST = process gamestate (Help "graveyard") = (false, gamestate)
 TEST = process gamestate (Help "board") = (false, gamestate) *)
 
 (* Test call of move funciton *)
-let (_, moved_gamestate) = move gamestate gamestate.human ser2 (3,9)
+(* let (_, moved_gamestate) = move gamestate gamestate.human ser2 (3,9)
 TEST = process gamestate (Move (ser2,(3,9))) = (true, moved_gamestate)
 
-TEST = process gamestate (Move (ser2,(1,9))) = (false, gamestate)
+TEST = process gamestate (Move (ser2,(1,9))) = (false, gamestate) *)

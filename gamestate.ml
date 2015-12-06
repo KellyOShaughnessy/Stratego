@@ -467,7 +467,7 @@ let rec print_game_board (game_board:game_board)=
           if player.name="human" then
             (piece_to_string piece)
           else
-            "  X  ")
+            " X  ")
     in
     let s2 =
       (if col=1 && row!=10 then

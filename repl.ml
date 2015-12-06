@@ -3,10 +3,6 @@ open Ai
 open Pervasives
 (* NOTE: WHEN COMPILING, USE 'cs3110 compile -p str repl.ml' *)
 
-(*TODO: add function to print opponent's graveyard list*)
-(*TODO: add restart function*)
-(*TODO: check the 'won' flag in gamestate*)
-
 (* Defining possible commands *)
 type cmd =
   | Quit
@@ -34,7 +30,8 @@ let print_retry () =
                       To see a list of commands, type \"help\".\n\n
                       Please type a command --> "
 
-let extract_piece (pc:string) : piece =
+(*TODO: fucks up when gets bad input, need a failwith*)
+let extract_piece (pc:string) : piece option=
   let pce_lst = [
     ("spy1",{pce="Spy";id=1});
     ("sco1", {pce="Scout";id=1});
@@ -56,8 +53,8 @@ let extract_piece (pc:string) : piece =
     ("lie2",{pce="Lieutenant";id=2});
     ("ser2",{pce="Sergeant";id=2});
     ("cor1",{pce="Corporal";id=1}) ] in
-  let ret_pce = (List.assoc pc pce_lst) in
-  ret_pce
+  if (List.mem_assoc pc pce_lst) then Some(List.assoc pc pce_lst)
+  else None
 
 (*Returns (-1,-1) if incorrect move format*)
 let extract_location_str (inp:string list) : string =
@@ -124,9 +121,10 @@ let rec parse inp =
       if (List.length input) > 2 then (
         let pce = extract_piece (List.nth input 1) in
         let loc = extract_location input in
-        match loc with
-        | (-1,-1) -> Invalid
-        | _ -> Move((pce,loc))
+        match pce,loc with
+        | _,(-1,-1) -> Invalid
+        | None,_    -> Invalid
+        | Some p,_  -> Move((p,loc))
       )
       else
         Invalid
@@ -136,9 +134,10 @@ let rec parse inp =
       if (List.length input) = 3 then (
         let pce = extract_piece (List.nth input 1) in
         let loc = extract_location input in
-        match loc with
-        | (-1,-1) -> Invalid
-        | _ -> Place((pce,loc)) )
+        match pce,loc with
+        | _,(-1,-1) -> Invalid
+        | None,_    -> Invalid
+        | Some p,_  -> Place((p,loc)) )
     else
       Invalid
     )
@@ -180,11 +179,11 @@ let new_game () =
     else (
       print_string ("\n\nPlease place these pieces on the board: "^
         (piecelst_to_string pieces));
-      print_string "\n\nWhere would you like to place your next piece?
-      Format: 'place <piece> <location>', where <piece> is the name of the
-      piece as listed in the list of pieces above, and <location> is the
-      location formatted as (row,column). ex: place Spy1 (2,3)
-      --> ";
+      Printf.printf "\n\nWhere would you like to place your next piece?
+      Format: 'place <piece> <location>'
+        - <piece> is the name of the piece as listed in the piece list above
+        - <location> is the location formatted as (row,column).
+            ex: place Spy1 (2,3)\nType here --> ";
       let input = read_line() in
       (* TODO: not yet fixed *)
       let place = parse input in
@@ -207,8 +206,13 @@ let new_game () =
         )
       )
       | _ -> print_string "\n\nThis is not valid syntax for placing your pieces.
+<<<<<<< HEAD
                             \nPlease try placing a piece.\n";
         build_human hum pieces
+=======
+                            Please try placing a piece.\n";
+        build_human hum c pieces
+>>>>>>> e41a369068c174a85825762959bbf095aae0bd51
     )
   ) in
   let empty_hum = newplayer "human" [] in
@@ -218,21 +222,11 @@ let new_game () =
   in print_gamestate gamestate;
   gamestate
 
-(*TODO: implement*)
-let quit gamestate =
-  print_string "Now quitting the game :'( -- Play again soon!!\n\n"
-(*   let rec quitted (game: gamestate):unit = (
-    let prompt2 = print_string "\nAre you sure you would like to quit this game?\n\n-> " in
-    let response2 =  String.lowercase(read_line prompt2) in
-    if response2 = "no"
-      then (print_string "\nOK.\n\n"; prompt game)
-      else if response2 = "yes" then Printf.printf "\nOK.\n\n";
-      else (print_string "\nPlease answer the question."; quitted game)
-    )
-  in quitted gamestate
- *)
+
 
 (******************************PRINT FUNCTIONS*********************************)
+
+(*call prompt to get the comamand. if command ois quit *)
 
 let print_game gamestate =
   print_gamestate gamestate
@@ -263,13 +257,14 @@ let print_help () =
       [quit] quits the game
       [new] will begin a new game
       [place <piece> <location>] will place the piece (such as Spy1) at
-        location (formatted as '(row,column)') in the board
+        location (formatted as '(row,column)') in the board. You may only
+        place ONE piece at a time.
       [instructions] will print out the instructions on how to play the game
       [move piece location] will move the [piece] to the desired [location].
         - Pieces are named with the first 3 letters and its id
         (ex: Miner with id 1 is 'Min 1').
         - Location is (row,column) as defined on the board
-      [pieces] prints the list of your pieces on the board and their location
+      [pieces] prints the list of your pieces on the board and their location. \n
       [graveyard] prints the list of your pieces in your graveyard
       [board] prints the current game board, displaying your pieces and
         the computer's pieces as X's \n \n"
@@ -300,25 +295,25 @@ let print_instructions () =
       - The following are the piece rankings and special cases, assume that
         any piece, unless noted otherwise, can only move 1 space at a time:
 
-        Spy:  rank = 1
-        Scout (Sco): rank = 2  Can move any number of spaces on
+        Spy:  rank = 1, Quantity: 1
+        Scout (Sco): rank = 2, Quantity: 2,  Can move any number of spaces on
           the board as long as there are no obstacles between
           start and end locations.
-        Miner (Min) = 3. Can defuse bombs
+        Miner (Min) = rank =3, Quantity: 2, Can defuse bombs
           (miner attacks bomb and remains on board).
-        Corporal (Cor) = 4.
-        Sergeant (Ser) = 5
-        Lieutenant (Lie) = 6
-        Captain (Cap) = 7. Can move up to two spaces on the
+        Corporal (Cor) = rank = 4, Quantity: 1
+        Sergeant (Ser) = rank = 5, Quantity: 2
+        Lieutenant (Lie) = rank = 6, Quantity: 2
+        Captain (Cap) = rank = 7, Quantity: 2, Can move up to two spaces on the
           board as long as there are no obstacles between
           start and end locations
-        Major (Maj) = 8
-        Colonel (Col) = 9n
-        General (Gen) = 10
-        Marshal (Mar) = 11
-        Flag (Fla) = No rank and immovable, but when attacked,
+        Major (Maj) = rank = 8, Quantity: 1
+        Colonel (Col) = rank = 9, Quantity: 1
+        General (Gen) = rank = 10, Quantity: 1
+        Marshal (Mar) = rank = 11, Quantity: 1
+        Flag (Fla) = Quantity: 1, No rank and immovable, but when attacked,
           game ends and attacking player wins the game
-        Bomb (Bom) = No rank and immovable, but when attacked,
+        Bomb (Bom) = Quantity: 3, No rank and immovable, but when attacked,
           attacking player loses piece and bomb is
           removed from board.
         \n"
@@ -328,106 +323,121 @@ let print_intro () : unit =
   get started, 'instructions' to understand how to play, or 'quit'
   if you just aren't up for the challenge right now.\n"
 
-(*TODO: Print function for when a player wins. Add in restart capabilities*)
-let rec check_for_win new_gs  =
+(*Print function for when a player wins.*)
+let rec check_for_win new_gs ai_move =
   match new_gs with
-  | None -> process None
+  | None -> process None ai_move
   | Some gs ->
     (if gs.human.won then
       (print_string "ALLSTAR!! YOU HAVE CAPTURED THE FLAG! YOU WIN! ";
       print_string "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ";
       print_string "Play again? ";
-      process None)
+      process None ai_move)
     else if gs.comp.won then
       (print_string "The computer beat you! AI's are taking over ";
       print_string "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  ";
       print_string "You can do better than that, try again? ";
-      process None)
+      process None ai_move)
     else
-      process new_gs)
+      process new_gs ai_move)
 
 (****************************GAME PLAY REPL*************************************)
 
+and quit_game game ai_move =
+  print_string "Now quitting the game :'( - Play again soon!\n \n";
+    print_string "\nAre you sure you would like to quit this game? Type yes or no. \n\n-> ";
+    let prompt2 = read_line () in
+    let response2 =  String.lowercase(prompt2) in
+    if response2 = "no"
+    then (print_string "\nOK.\n\n"; process game ai_move)
+    else if response2 = "yes" then Printf.printf "\nGoodbuy.\n\n"
+    else (print_string "\nPlease answer yes or no."; quit_game game ai_move)
 
-(*TODO: process needs to return a unit because this is the main repl function.
-This might conflict with how the 'move' function returns a gamestate option.*)
-and process gamestate =
-  (*TODO: check if 'won' is true*)
+and process gamestate ai_move =
+  let name = (
+    match gamestate with
+    | Some g -> g.turn.name
+    | None -> "" ) in
+  if (name = "computer")
+    then (
+    let new_ai_move = next_move gamestate [] ai_move [] in
+    process gamestate new_ai_move)
+  else (
   print_string "Type a command --> ";
   let cmd = parse (read_line()) in
   match cmd with
-  | Quit -> (quit gamestate)
+  | Quit -> (quit_game gamestate ai_move)
   | NewGame -> (
       let g = new_game () in
       print_game g;
-      process (Some(g))
+      process (Some(g)) ai_move
     )
   | Help -> (
       print_help ();
-      process gamestate
+      process gamestate ai_move
     )
   | Move (pce,loc) -> (
       match gamestate with
       | None ->
           (print_string "You must start the game before you can move your pieces!\n";
           print_intro ();
-          process None)
+          process None ai_move)
       | Some g ->
           (let new_gs = move g g.turn pce loc in
-          check_for_win new_gs)
+          check_for_win new_gs ai_move)
     )
   | Place (p,l) -> (
       match gamestate with
       | None -> print_string "Initialization failed. Please quit and try again."
       | Some g -> (
-        print_string "You have already placed all of your pieces!\n";
-        process gamestate )
+        print_string "You have already placed all of your pieces! Try another command.\n";
+        process gamestate ai_move)
     )
   | Pieces -> (
       match gamestate with
       | None -> (
           print_string "You must start the game before you can print your pieces!\n";
           print_intro ();
-          process None )
+          process None ai_move)
       | Some g ->
           print_pieces g;
-          process gamestate
+          process gamestate ai_move
     )
   | Graveyard -> (
       match gamestate with
       | None -> (
           print_string "You must start the game before you can print your graveyard!\n";
           print_intro ();
-          process None )
+          process None ai_move)
       | Some g ->
           print_graveyard g.human;
-          process gamestate
+          process gamestate ai_move
     )
   | Board ->(
       match gamestate with
       | None -> (
           print_string "You must start the game before you can print the board!\n";
           print_intro ();
-          process None )
+          process None ai_move)
       | Some g ->
           print_graveyard g.human;
-          process gamestate
+          process gamestate ai_move
     )
   | Instructions -> (
       print_instructions ();
-      process gamestate
+      process gamestate ai_move
     )
   | Invalid -> (
       print_retry ();
-      process gamestate
+      process gamestate ai_move
     )
+)
 
 (*Main function that begins gameplay prompting*)
-(*NOTE: I think main function needs to be all units; can't return gamestate*)
 let () =
   Printf.printf "\nWelcome to Stratego!\n\n";
   print_string "Check out the commands below.\n";
   print_intro ();
   print_help ();
-  process None
+  process None None
 
