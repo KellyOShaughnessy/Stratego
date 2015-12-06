@@ -195,7 +195,19 @@ let choose_piece player movable_pieces  =
   else
     None
 
-let rec next_move gamestate flag_locations recent_move tried_moves =
+(* Returns true if this piece is on the board, false if not *)
+let is_on_board gamestate piece loc =
+  match List.assoc loc gamestate.gb with
+  | None -> false
+  | Some(pce,player) -> pce=piece && player.name="comp"
+
+let get_opt opt =
+  match opt with
+  | None -> failwith "This should never happen, no gameboard exists"
+  | Some g -> g
+
+let rec next_move gs flag_locations recent_move tried_moves =
+  let gamestate = get_opt gs in
   let movable_pieces =
     List.filter
       (fun (piece,_) -> piece.pce!="Bomb" && piece.pce!="Flag")
@@ -212,15 +224,18 @@ let rec next_move gamestate flag_locations recent_move tried_moves =
         (match choose_destination gamestate pce_to_move cur_location [] with
           | None ->
             (* Piece is immovable, try again with new piece *)
-            next_move gamestate flag_locations
+            next_move (Some gamestate) flag_locations
               recent_move (pce_to_move::tried_moves)
           | Some loc -> Some (pce_to_move, loc)))
     | Some (pce_to_move,cur_location) ->
-      (* Move this piece until something happens with it *)
-      (match choose_destination gamestate pce_to_move cur_location [] with
-        | None ->
-            next_move gamestate flag_locations None (pce_to_move::tried_moves)
-        | Some loc -> Some (pce_to_move, loc))
+      if is_on_board gamestate pce_to_move cur_location then
+        (* Move this piece until something happens with it *)
+        (match choose_destination gamestate pce_to_move cur_location [] with
+          | None ->
+              next_move (Some gamestate) flag_locations None (pce_to_move::tried_moves)
+          | Some loc -> Some (pce_to_move, loc))
+      else
+        next_move (Some gamestate) flag_locations None tried_moves
   else
     (* No possible moves for any pieces, computer loses! *)
     None

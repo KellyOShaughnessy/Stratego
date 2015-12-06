@@ -462,7 +462,7 @@ let rec print_game_board (game_board:game_board)=
   | ((row,col),some_piece)::t ->
     let s1 =
       (match some_piece with
-      | None -> "     "
+      | None -> "    "
       | Some (piece,player) ->
           if player.name="human" then
             (piece_to_string piece)
@@ -472,11 +472,11 @@ let rec print_game_board (game_board:game_board)=
     let s2 =
       (if col=1 && row!=10 then
         "     "^
-        "---------------------------------------------------------------------------------\n  "^
+        "-----------------------------------------------------------------------\n  "^
         (string_of_int row)^"  | "^s1^" |"
       else if col=1 && row=10 then
         "     "^
-        "---------------------------------------------------------------------------------\n "^
+        "-----------------------------------------------------------------------\n "^
         (string_of_int row)^"  | "^s1^" |"
       else if col=10 then
         " "^s1^" |\n"
@@ -485,8 +485,8 @@ let rec print_game_board (game_board:game_board)=
     in
     let s3 = (
       if row = 1 && col = 10 then
-       s2^"     ---------------------------------------------------------------------------------"
-       ^"\n         1       2       3       4       5       6       7       8       9      10\n"
+       s2^"     -----------------------------------------------------------------------"
+       ^"\n        1      2      3      4      5      6      7      8      9     10\n"
 
      else s2
     ) in

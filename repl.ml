@@ -1,5 +1,6 @@
 open Gamestate
 open Ai
+open Pervasives
 (* NOTE: WHEN COMPILING, USE 'cs3110 compile -p str repl.ml' *)
 
 (*TODO: add function to print opponent's graveyard list*)
@@ -23,10 +24,9 @@ let fix_input (inp:string) : string list =
   (*lowercase & get rid of extraneous characters*)
   let input_lower = String.lowercase inp in
   let input_trim = String.trim input_lower in
-  let input_better = Str.global_replace (Str.regexp "[^0-9a-zA-Z ]+") "" input_trim in
   (*splits into list*)
   let regex = Str.regexp " +" in
-  let ret_list = Str.split regex input_better in
+  let ret_list = Str.split regex input_trim in
   ret_list
 
 let print_retry () =
@@ -88,11 +88,11 @@ let extract_location (inp:string list) : int*int =
       | _    -> (
         if (paren1 && paren2) then
           let before_com =
-            (try int_of_string (String.sub loc_str 1 comma)
-            with | Not_found -> -1 ) in
+           (try int_of_string (String.sub loc_str 1 (comma-1))
+            with | Failure x -> -1 | Not_found -> -1) in
           let after_com  =
            (try int_of_string (String.sub loc_str comma (last - comma +1))
-            with | Not_found -> -1 ) in
+            with | Failure x -> -1 | Not_found -> -1) in
           (before_com,after_com)
         else
           (-1,-1)
@@ -206,8 +206,8 @@ let new_game () =
         )
       )
       | _ -> print_string "\n\nThis is not valid syntax for placing your pieces.
-                            Please try placing a piece again.\n\n";
-            build_human hum c pieces
+                            \nPlease try placing a piece.\n";
+        build_human hum c pieces
     )
   ) in
   let empty_hum = newplayer "human" [] in
@@ -319,27 +319,34 @@ let print_instructions () =
         \n"
 
 let print_intro () : unit =
-  print_string "Type 'help' to revisit the list of commands, type 'new' to\n
-                get started, 'instructions' to understand how to play, or 'quit'\n
-                if you just aren't up for the challenge right now.\n\n"
+  print_string "  Type 'help' to revisit the list of commands, type 'new' to
+  get started, 'instructions' to understand how to play, or 'quit'
+  if you just aren't up for the challenge right now.\n"
 
 (*TODO: Print function for when a player wins. Add in restart capabilities*)
-(* let check_for_win gamestate : bool =
-  match gamestate with
-  | None -> false
-  | Some x -> (
-      if x.turn.won = true
-      then true (print_game x; win ())
-  print_string "
-    \n\n~~~~~~~~~~~~~~~~~~~~~~~~~WINNER!!!!!!~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n" *)
+let rec check_for_win new_gs  =
+  match new_gs with
+  | None -> process None
+  | Some gs ->
+    (if gs.human.won then
+      (print_string "ALLSTAR!! YOU HAVE CAPTURED THE FLAG! YOU WIN! ";
+      print_string "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ";
+      print_string "Play again? ";
+      process None)
+    else if gs.comp.won then
+      (print_string "The computer beat you! AI's are taking over ";
+      print_string "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~  ";
+      print_string "You can do better than that, try again? ";
+      process None)
+    else
+      process new_gs)
 
 (****************************GAME PLAY REPL*************************************)
 
-(*TODO: I took out bool in the (bool*gamestate) tuple so need to actually change
- the "turn" field in gamestate at each stage for whose turn it is *)
+
 (*TODO: process needs to return a unit because this is the main repl function.
 This might conflict with how the 'move' function returns a gamestate option.*)
-let rec process gamestate =
+and process gamestate =
   (*TODO: check if 'won' is true*)
   print_string "Type a command --> ";
   let cmd = parse (read_line()) in
@@ -356,16 +363,17 @@ let rec process gamestate =
     )
   | Move (pce,loc) -> (
       match gamestate with
-      | None -> (
-          print_string "You must start the game before you can move your pieces!\n";
+      | None ->
+          (print_string "You must start the game before you can move your pieces!\n";
           print_intro ();
           process None)
-      | Some g -> (
-        process (move g g.turn pce loc) )
+      | Some g ->
+          (let new_gs = move g g.turn pce loc in
+          check_for_win new_gs)
     )
   | Place (p,l) -> (
       match gamestate with
-      | None -> failwith "unimplemented"
+      | None -> print_string "Initialization failed. Please quit and try again."
       | Some g -> (
         print_string "You have already placed all of your pieces!\n";
         process gamestate )
