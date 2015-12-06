@@ -367,7 +367,7 @@ let rec process gamestate =
       match gamestate with
       | None -> print_string "Initialization failed. Please quit and try again."
       | Some g -> (
-        print_string "You have already placed all of your pieces!\n";
+        print_string "You have already placed all of your pieces! Try another command.";
         process gamestate )
     )
   | Pieces -> (
