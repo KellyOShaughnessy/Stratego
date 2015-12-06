@@ -328,11 +328,22 @@ let print_intro () : unit =
 
 (****************************GAME PLAY REPL*************************************)
 
+
+let rec quit_game game =
+  print_string "Now quitting the game :'( - Play again soon!\n \n";
+    print_string "\nAre you sure you would like to quit this game? Type yes or no. \n\n-> ";
+    let prompt2 = read_line () in
+    let response2 =  String.lowercase(prompt2) in
+    if response2 = "no"
+    then (print_string "\nOK.\n\n"; process (game))
+    else if response2 = "yes" then Printf.printf "\nGoodbuy.\n\n"
+    else (print_string "\nPlease answer yes or no."; quit_game (game))
+
 (*TODO: I took out bool in the (bool*gamestate) tuple so need to actually change
  the "turn" field in gamestate at each stage for whose turn it is *)
 (*TODO: process needs to return a unit because this is the main repl function.
 This might conflict with how the 'move' function returns a gamestate option.*)
-let rec process gamestate =
+and process gamestate =
   (*TODO: check if 'won' is true*)
   print_string "Type a command --> ";
   let cmd = parse (read_line()) in
@@ -402,15 +413,7 @@ let rec process gamestate =
       process gamestate
     )
 
-and quit_game (game: gamestate option) =
-    print_string "\nAre you sure you would like to quit this game? Type yes or no. \n\n-> ";
-    let prompt2 = read_line () in
-    let response2 =  String.lowercase(prompt2) in
-    if response2 = "no"
-      then (print_string "\nOK.\n\n"; process (Some game))
-      else if response2 = "yes" then Printf.printf "\nGoodbuy.\n\n"
-      else (print_string "\nPlease answer yes or no."; quit_game (Some game))
-    in quit_game (Some game)
+
 
 
 (*Main function that begins gameplay prompting*)
