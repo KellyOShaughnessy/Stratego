@@ -3,7 +3,6 @@ open Ai
 open Pervasives
 (* NOTE: WHEN COMPILING, USE 'cs3110 compile -p str repl.ml' *)
 
-(* TODO: quit during initialization *)
 (* TODO: make sure it doesn't print two gameboards when you do quickstart*)
 (* Defining possible commands *)
 type cmd =
@@ -258,7 +257,6 @@ let quickstart () =
   let comp = setup () in
   let human = {comp with name = "human"; pieces=hum_quickstart_pces} in
   new_gamestate human comp
-
 
 (******************************PRINT FUNCTIONS*********************************)
 
