@@ -384,17 +384,22 @@ and quit_game game ai_move =
     else (print_string "\nPlease answer yes or no."; quit_game game ai_move)
 
 and process gamestate ai_move =
+  let _ = (match gamestate with | None -> () | Some g -> print_gamestate g) in
   let name = (
     match gamestate with
     | Some g -> g.turn.name
     | None -> "" ) in
-  if (name = "computer")
-    then (
-    let new_ai_move = next_move gamestate [] ai_move [] in
-    process gamestate new_ai_move)
-  else (
-  print_string "To see list of commands, type 'help'\nType a command --> ";
-  let cmd = parse (read_line()) in
+  let cmd = (
+    if name = "comp"
+      then
+        (match next_move gamestate [] ai_move [] with
+        | None -> failwith "unimplemented, computer has lost has no mroe moves"
+        | Some(piece,loc) -> Move(piece,loc))
+    else (
+      print_string "To see list of commands, type 'help'\nType a command --> ";
+      parse (read_line()))
+  )
+ in
   match cmd with
   | Quit -> (quit_game gamestate ai_move)
   | NewGame -> (
@@ -414,7 +419,9 @@ and process gamestate ai_move =
           process None ai_move)
       | Some g ->
           (let new_gs = move g g.turn pce loc in
-          check_for_win new_gs ai_move)
+          match new_gs with
+          | None -> process gamestate ai_move
+          | Some g -> check_for_win new_gs ai_move)
     )
   | Place (p,l) -> (
       match gamestate with
@@ -466,7 +473,6 @@ and process gamestate ai_move =
       print_retry ();
       process gamestate ai_move
     )
-)
 
 (*Main function that begins gameplay prompting*)
 let () =
